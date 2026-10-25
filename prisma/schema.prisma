@@ -1,0 +1,22 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// M1은 DB에 응답을 저장하지 않습니다. 향후 임시 세션 저장을 위한 기본 구조입니다.
+// 외부 조회에는 추측 가능한 ID 대신 세션별 접근 검증이 필요합니다.
+model AssessmentSession {
+  id                   String   @id @default(cuid())
+  questionnaireVersion String
+  scoringVersion       String
+  answersJson          String
+  scoresJson           String?
+  createdAt            DateTime @default(now())
+  expiresAt            DateTime
+
+  @@index([expiresAt])
+}

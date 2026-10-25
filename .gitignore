@@ -1,0 +1,17 @@
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+prisma/*.db
+prisma/*.db-journal
+prisma/*.db-wal
+prisma/*.db-shm
+*.log
+.test-build/
+
+# 이 앱과 별개인 프로젝트 파일
+deepzone/
