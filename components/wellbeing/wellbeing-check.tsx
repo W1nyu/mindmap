@@ -2,24 +2,27 @@
 
 import { useMemo, useState } from "react";
 import { Icon } from "@/components/icon";
-import { WELLBEING_PERIOD_DAYS, wellbeingBands, wellbeingItems, wellbeingOptions, type WellbeingValue } from "@/data/wellbeing";
-import { createCheck, itemAverages, nextCheckDate, wellbeingTrend, type WellbeingCheck } from "@/lib/wellbeing";
+import { wellbeingBands, wellbeingItems, wellbeingOptions, wellbeingPeriods, type WellbeingPeriod, type WellbeingValue } from "@/data/wellbeing";
+import { addCheck, createCheck, itemAverages, wellbeingTrend, type WellbeingCheck } from "@/lib/wellbeing";
 import { ItemProfile, WellbeingGauge, WellbeingTrend } from "./wellbeing-charts";
 import { wellbeingStore } from "./wellbeing-store";
 
 const longDate = (date: Date) => date.toLocaleDateString("ko-KR", { month: "long", day: "numeric", weekday: "short" });
+const formPeriods = ["day", "week"] as const;
 
-function CheckForm({ onDone, onCancel }: { onDone: (check: WellbeingCheck) => void; onCancel: (() => void) | null }) {
+function CheckForm({ initialPeriod, onDone, onCancel }: { initialPeriod: WellbeingPeriod; onDone: (check: WellbeingCheck) => void; onCancel: (() => void) | null }) {
+  const [period, setPeriod] = useState<WellbeingPeriod>(initialPeriod === "week" ? "week" : "day");
   const [answers, setAnswers] = useState<(WellbeingValue | null)[]>(() => wellbeingItems.map(() => null));
   const answered = answers.filter((value) => value !== null).length;
   const complete = answered === wellbeingItems.length;
   function submit(event: React.FormEvent) {
     event.preventDefault();
     if (!complete) return;
-    onDone(createCheck(answers as WellbeingValue[], new Date(), `w-${crypto.randomUUID()}`));
+    onDone(createCheck(answers as WellbeingValue[], new Date(), `w-${crypto.randomUUID()}`, period));
   }
   return <form className="viz-card wb-form" onSubmit={submit} aria-labelledby="wb-form-title">
-    <div className="viz-heading"><div><h2 id="wb-form-title">지난 2주 동안 나는…</h2><p className="viz-caption" style={{ marginTop: 2 }}>얼마나 자주 그랬는지 골라 주세요.</p></div><span className="subtle-label">{answered} / {wellbeingItems.length}</span></div>
+    <div className="wb-period" role="group" aria-label="체크 기간">{formPeriods.map((id) => <button key={id} type="button" aria-pressed={period === id} onClick={() => setPeriod(id)}>{wellbeingPeriods[id].label}</button>)}</div>
+    <div className="viz-heading"><div><h2 id="wb-form-title">{wellbeingPeriods[period].heading}</h2><p className="viz-caption" style={{ marginTop: 2 }}>얼마나 자주 그랬는지 골라 주세요.</p></div><span className="subtle-label">{answered} / {wellbeingItems.length}</span></div>
     <ol className="wb-questions">
       {wellbeingItems.map((item, index) => <li key={item.id}>
         <fieldset>
@@ -34,43 +37,50 @@ function CheckForm({ onDone, onCancel }: { onDone: (check: WellbeingCheck) => vo
       </li>)}
     </ol>
     <div className="session-actions">
-      <button type="submit" className="button button-primary" disabled={!complete}>{complete ? "체크 저장하고 결과 보기" : `${wellbeingItems.length - answered}문장 남았어요`}</button>
+      <button type="submit" className="button button-primary" disabled={!complete}>{complete ? "체크 저장" : `${wellbeingItems.length - answered}문장 남았어요`}</button>
       {onCancel && <button type="button" className="text-link" onClick={onCancel}>취소</button>}
     </div>
+    <p className="viz-caption">같은 날 같은 기간으로 다시 체크하면 그날 기록이 새 응답으로 바뀌어요.</p>
   </form>;
 }
 
 export function WellbeingCheckApp() {
   const store = wellbeingStore.useValue();
   const [mode, setMode] = useState<"auto" | "form" | "result">("auto");
+  const [filter, setFilter] = useState<WellbeingPeriod | "all">("all");
   const [confirmDelete, setConfirmDelete] = useState("");
-  const [now] = useState(() => Date.now());
   const go = (next: "form" | "result") => {
     setMode(next);
     window.scrollTo({ top: 0 });
   };
   const checks = store.value;
-  const points = useMemo(() => wellbeingTrend(checks), [checks]);
+  const allPoints = useMemo(() => wellbeingTrend(checks), [checks]);
+  const periodsUsed = useMemo(() => [...new Set(checks.map((check) => check.period))], [checks]);
+  const trendPoints = useMemo(() => wellbeingTrend(checks, filter === "all" ? undefined : filter), [checks, filter]);
   if (!store.ready) return <p role="status">저장된 체크를 확인하고 있어요.</p>;
 
+  const latest = allPoints[allPoints.length - 1];
   const showForm = mode === "form" || (mode === "auto" && checks.length === 0);
   if (showForm) {
-    return <CheckForm onCancel={checks.length > 0 ? () => go("result") : null} onDone={(check) => { wellbeingStore.set([check, ...checks]); go("result"); }} />;
+    return <CheckForm initialPeriod={latest?.period ?? "day"} onCancel={checks.length > 0 ? () => go("result") : null} onDone={(check) => { wellbeingStore.set(addCheck(checks, check)); go("result"); }} />;
   }
 
-  const latest = points[points.length - 1];
-  const previous = points.length > 1 ? points[points.length - 2] : null;
+  const samePeriod = wellbeingTrend(checks, latest.period);
+  const previous = samePeriod.length > 1 ? samePeriod[samePeriod.length - 2] : null;
+  const change = samePeriod[samePeriod.length - 1];
   const band = wellbeingBands.find((item) => item.id === latest.band)!;
-  const next = nextCheckDate(checks, WELLBEING_PERIOD_DAYS)!;
   const averages = checks.length > 1 ? itemAverages(checks) : null;
   const strongest = wellbeingItems[latest.answers.indexOf(Math.max(...latest.answers) as WellbeingValue)];
-  const recent = now < next.getTime();
 
   return <div className="result-stack">
+    <div className="wb-actions">
+      <button type="button" className="button button-primary" onClick={() => go("form")}><Icon name="pulse" size={17} /> 새로 체크하기</button>
+      <p className="viz-caption">매일 또는 매주 같은 때에 체크하면 변화가 잘 보여요.</p>
+    </div>
     <div className="wb-top">
       <section className={`viz-card wb-score-card ${latest.band}`} aria-labelledby="wb-score-title">
-        <div className="viz-heading"><div><h2 id="wb-score-title">최근 2주의 웰빙</h2><p className="viz-caption" style={{ marginTop: 2 }}>{longDate(new Date(latest.takenAt))} 체크 · 원점수 {latest.raw}/25</p></div></div>
-        <div className="wb-score-line"><strong>{latest.score}</strong><span>/ 100</span>{latest.change !== null && <em className={latest.meaningful ? (latest.change > 0 ? "up" : "down") : ""}>{latest.change > 0 ? "+" : ""}{latest.change}{latest.meaningful ? " · 의미 있는 변화" : " · 비슷한 수준"}</em>}</div>
+        <div className="viz-heading"><div><h2 id="wb-score-title">{wellbeingPeriods[latest.period].label}의 상태</h2><p className="viz-caption" style={{ marginTop: 2 }}>{longDate(new Date(latest.takenAt))} 체크 · 원점수 {latest.raw}/25</p></div></div>
+        <div className="wb-score-line"><strong>{latest.score}</strong><span>/ 100</span>{change.change !== null && <em className={change.meaningful ? (change.change > 0 ? "up" : "down") : ""}>{change.change > 0 ? "+" : ""}{change.change}{change.meaningful ? " · 큰 변화" : " · 비슷한 수준"}</em>}</div>
         <WellbeingGauge point={latest} previous={previous} />
         <h3 className="wb-band-label">{band.label}</h3>
         <p className="viz-text">{band.text}</p>
@@ -80,34 +90,31 @@ export function WellbeingCheckApp() {
         <div className="viz-heading"><div><h2 id="wb-items-title">다섯 영역</h2>{averages && <p className="viz-caption" style={{ marginTop: 2 }}>세로 표시는 평균이에요.</p>}</div></div>
         <ItemProfile answers={latest.answers} averages={averages} />
         <div className="wb-item-notes">
-          {latest.answers[wellbeingItems.indexOf(strongest)] >= 3 && <p><Icon name="leaf" size={15} /> <span>지금 나를 가장 받쳐 주는 영역은 <strong>{strongest.short}</strong>. 무엇이 이 부분을 지켜 주었는지 떠올려 보세요.</span></p>}
-          {latest.lowItems.length > 0 && <p><Icon name="spark" size={15} /> <span>‘가끔’ 이하였던 영역은 <strong>{latest.lowItems.map((id) => wellbeingItems.find((item) => item.id === id)!.short).join(", ")}</strong>. 다음 2주에 조금 더 돌봐 줄 곳이에요.</span></p>}
+          {latest.answers[wellbeingItems.indexOf(strongest)] >= 3 && <p><Icon name="leaf" size={15} /> <span>지금 나를 가장 받쳐 주는 영역은 <strong>{strongest.short}</strong>.</span></p>}
+          {latest.lowItems.length > 0 && <p><Icon name="spark" size={15} /> <span>‘가끔’ 이하였던 영역은 <strong>{latest.lowItems.map((id) => wellbeingItems.find((item) => item.id === id)!.short).join(", ")}</strong>. 조금 더 돌봐 줄 곳이에요.</span></p>}
         </div>
       </section>
     </div>
 
     <section className="viz-card" aria-labelledby="wb-trend-title">
-      <div className="viz-heading"><div><h2 id="wb-trend-title">시간에 따른 변화</h2></div><span className="subtle-label">{checks.length}회 체크</span></div>
-      {points.length > 1 ? <WellbeingTrend points={points} /> : <p className="viz-text">두 번 이상 체크하면 변화가 선으로 보여요. 다음 체크: <strong>{longDate(next)}</strong> 이후</p>}
+      <div className="viz-heading"><div><h2 id="wb-trend-title">시간에 따른 변화</h2></div>
+        {periodsUsed.length > 1 ? <div className="wb-period small" role="group" aria-label="보는 기간">{(["all", ...periodsUsed] as const).map((id) => <button key={id} type="button" aria-pressed={filter === id} onClick={() => setFilter(id)}>{id === "all" ? "전체" : wellbeingPeriods[id].label}</button>)}</div>
+          : <span className="subtle-label">{checks.length}회 체크</span>}</div>
+      {trendPoints.length > 1 ? <WellbeingTrend points={trendPoints} /> : <p className="viz-text">두 번 이상 체크하면 변화가 선으로 보여요.</p>}
     </section>
-
-    <div className="wb-actions">
-      <button type="button" className="button button-primary" onClick={() => go("form")}><Icon name="pulse" size={17} /> 새로 체크하기</button>
-      <p className="viz-caption">{recent ? `다음 체크 권장: ${longDate(next)} 이후` : "새로 체크할 때가 됐어요."}</p>
-    </div>
 
     <section className="viz-card" aria-labelledby="wb-history-title">
       <div className="viz-heading"><h2 id="wb-history-title">체크 기록</h2></div>
-      <ul className="wb-history">{[...points].reverse().map((point) => <li key={point.id}>
-        <span className="wb-history-date">{longDate(new Date(point.takenAt))}</span>
+      <ul className="wb-history">{[...allPoints].reverse().map((point) => <li key={point.id}>
+        <span className="wb-history-date">{longDate(new Date(point.takenAt))} <small>{wellbeingPeriods[point.period].label}</small></span>
         <span className={`wb-history-score ${point.band}`}>{point.score}</span>
-        <span className="wb-history-band">{wellbeingBands.find((item) => item.id === point.band)!.label}{point.change !== null ? ` · ${point.change > 0 ? "+" : ""}${point.change}` : ""}</span>
+        <span className="wb-history-band">{wellbeingBands.find((item) => item.id === point.band)!.label}</span>
         {confirmDelete === point.id
           ? <span className="wb-history-confirm"><button type="button" className="text-link danger" onClick={() => { wellbeingStore.set(checks.filter((check) => check.id !== point.id)); setConfirmDelete(""); }}>지우기</button><button type="button" className="text-link" onClick={() => setConfirmDelete("")}>취소</button></span>
           : <button type="button" className="icon-button" aria-label={`${longDate(new Date(point.takenAt))} 체크 지우기`} onClick={() => setConfirmDelete(point.id)}><Icon name="trash" size={16} /></button>}
       </li>)}</ul>
     </section>
 
-    <p className="viz-caption">WHO-5 웰빙 지표(Topp 외, 2015) · 10점 이상 변화를 의미 있는 변화로 표시해요.</p>
+    <p className="viz-caption">WHO-5 웰빙 지표(WHO, 1998; Topp 외, 2015) · 원 척도는 2주를 묻지만 하루·한 주 단위로도 쓸 수 있게 했어요. 같은 기간끼리 10점 이상 움직이면 ‘큰 변화’로 표시해요.</p>
   </div>;
 }

@@ -3,10 +3,10 @@
 const base = (process.argv[2] ?? "http://localhost:3000").replace(/\/$/, "");
 
 const pages = [
-  "/", "/questions", "/questions/reaction", "/questions/defense", "/questions/traits", "/questions/attachment",
-  "/results", "/results?example=1", "/results/reaction", "/results/defense", "/results/traits", "/results/attachment", "/check-in",
+  "/", "/questions", "/questions/emotion", "/questions/emotion?form=deep", "/questions/defense", "/questions/defense?form=deep", "/questions/traits", "/questions/attachment",
+  "/results", "/results?example=1", "/results/emotion", "/results/defense", "/results/traits", "/results/attachment", "/check-in",
 ];
-const missing = ["/questions/unknown", "/results/unknown", "/nope", "/journal", "/support"];
+const missing = ["/questions/unknown", "/results/unknown", "/questions/reaction", "/nope", "/journal"];
 const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 

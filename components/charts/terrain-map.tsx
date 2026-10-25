@@ -164,7 +164,7 @@ export function TerrainMap({ results, example = false, interactive = true, compa
     })}
     {mounted && !focusModule && moduleIds.filter((id) => !completed.has(id)).map((id) => {
       const area = regionCenter(id);
-      const label = <text className="terrain-pending-text" x={area.cx} y={area.cy} textAnchor="middle" dominantBaseline="middle">{pendingText ?? (interactive && !example ? `응답 전 · 약 ${assessmentModules[id].estimatedMinutes}분이면 솟아올라요` : "공유되지 않은 지역")}</text>;
+      const label = <text className="terrain-pending-text" x={area.cx} y={area.cy} textAnchor="middle" dominantBaseline="middle">{pendingText ?? (interactive && !example ? `검사 전 · 약 ${assessmentModules[id].forms.brief.estimatedMinutes}분이면 솟아올라요` : "공유되지 않은 지역")}</text>;
       return <g key={`p-${id}`}>
         <ellipse className="terrain-pending-area" cx={area.cx} cy={area.cy} rx={area.rx} ry={area.ry} />
         {interactive && !example && !pendingText ? <a href={`/questions/${id}`} aria-label={`${assessmentModules[id].title} 시작하기`}>{label}</a> : label}

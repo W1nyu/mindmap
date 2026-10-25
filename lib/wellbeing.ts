@@ -1,7 +1,7 @@
-import { WELLBEING_VERSION, wellbeingBands, wellbeingItems, type WellbeingBandId, type WellbeingItemId, type WellbeingValue } from "../data/wellbeing";
+import { WELLBEING_VERSION, wellbeingBands, wellbeingItems, wellbeingPeriods, type WellbeingBandId, type WellbeingItemId, type WellbeingPeriod, type WellbeingValue } from "../data/wellbeing";
 
 export const WELLBEING_STORAGE_KEY = "selfmap.wellbeing.v1";
-/** Topp 외(2015): 10점(원점수 2.5) 이상의 차이를 의미 있는 변화로 봅니다. */
+/** Topp 외(2015): 10점(원점수 2.5) 이상의 차이를 의미 있는 변화로 봅니다(원 척도 2주 기준의 참고값). */
 export const MEANINGFUL_CHANGE = 10;
 /** 한 문항이라도 0–1(‘전혀’·‘가끔’)이면 그 영역을 따로 살펴보도록 안내합니다. */
 export const LOW_ITEM_MAX = 1;
@@ -11,6 +11,8 @@ export interface WellbeingCheck {
   id: string;
   takenAt: string;
   version: string;
+  /** 묻는 기간. 이전 체크에는 없어 ‘지난 2주’로 읽습니다. */
+  period: WellbeingPeriod;
   /** wellbeingItems 순서대로 0–5 */
   answers: readonly WellbeingValue[];
 }
@@ -25,6 +27,7 @@ export interface WellbeingScore {
 export interface WellbeingPoint extends WellbeingScore {
   id: string;
   takenAt: string;
+  period: WellbeingPeriod;
   answers: readonly WellbeingValue[];
   /** 바로 앞 체크와의 차이. 첫 체크는 null */
   change: number | null;
@@ -54,7 +57,9 @@ export function validateCheck(value: unknown): WellbeingCheck | null {
   if (typeof data.takenAt !== "string" || Number.isNaN(Date.parse(data.takenAt))) return null;
   if (typeof data.version !== "string" || data.version !== WELLBEING_VERSION) return null;
   if (!Array.isArray(data.answers) || data.answers.length !== wellbeingItems.length || !data.answers.every(isValue)) return null;
-  return { id: data.id, takenAt: data.takenAt, version: data.version, answers: data.answers as WellbeingValue[] };
+  const period = data.period === undefined ? "twoWeeks" : data.period;
+  if (typeof period !== "string" || !(period in wellbeingPeriods)) return null;
+  return { id: data.id, takenAt: data.takenAt, version: data.version, period: period as WellbeingPeriod, answers: data.answers as WellbeingValue[] };
 }
 
 /** 최신순으로 정렬하고 같은 ID는 하나만 남깁니다. */
@@ -78,29 +83,30 @@ export function parseChecks(raw: string): WellbeingCheck[] | null {
   }
 }
 
-export function createCheck(answers: readonly WellbeingValue[], now: Date, id: string): WellbeingCheck {
+export function createCheck(answers: readonly WellbeingValue[], now: Date, id: string, period: WellbeingPeriod = "day"): WellbeingCheck {
   scoreWellbeing(answers);
-  return { id, takenAt: now.toISOString(), version: WELLBEING_VERSION, answers: [...answers] };
+  return { id, takenAt: now.toISOString(), version: WELLBEING_VERSION, period, answers: [...answers] };
 }
 
-/** 시간순(오래된 것부터) 점수와 직전 대비 변화. */
-export function wellbeingTrend(checks: readonly WellbeingCheck[]): WellbeingPoint[] {
-  const ordered = normalizeChecks(checks).reverse();
+const localDay = (iso: string) => {
+  const date = new Date(iso);
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+};
+
+/** 새 체크를 더합니다. 같은 날 같은 기간으로 한 체크가 있으면 새 체크로 바꿉니다(하루 한 번). */
+export function addCheck(checks: readonly WellbeingCheck[], check: WellbeingCheck): WellbeingCheck[] {
+  return normalizeChecks([check, ...checks.filter((item) => !(item.period === check.period && localDay(item.takenAt) === localDay(check.takenAt)))]);
+}
+
+/** 시간순(오래된 것부터) 점수와 직전 대비 변화. period를 주면 그 기간의 체크만 잇습니다. */
+export function wellbeingTrend(checks: readonly WellbeingCheck[], period?: WellbeingPeriod): WellbeingPoint[] {
+  const ordered = normalizeChecks(checks).filter((check) => !period || check.period === period).reverse();
   return ordered.map((check, index) => {
     const score = scoreWellbeing(check.answers);
     const previous = index > 0 ? scoreWellbeing(ordered[index - 1].answers).score : null;
     const change = previous === null ? null : score.score - previous;
-    return { id: check.id, takenAt: check.takenAt, answers: check.answers, ...score, change, meaningful: change !== null && Math.abs(change) >= MEANINGFUL_CHANGE };
+    return { id: check.id, takenAt: check.takenAt, period: check.period, answers: check.answers, ...score, change, meaningful: change !== null && Math.abs(change) >= MEANINGFUL_CHANGE };
   });
-}
-
-/** 다음 체크를 권하는 날: 마지막 체크가 묻는 2주가 지난 뒤. */
-export function nextCheckDate(checks: readonly WellbeingCheck[], periodDays: number): Date | null {
-  const latest = normalizeChecks(checks)[0];
-  if (!latest) return null;
-  const date = new Date(latest.takenAt);
-  date.setDate(date.getDate() + periodDays);
-  return date;
 }
 
 /** 문항별 평균(0–5, 소수 첫째 자리). 여러 번 체크했을 때 늘 낮거나 높은 영역을 찾는 데 씁니다. */

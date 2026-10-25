@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { WELLBEING_VERSION, type WellbeingValue } from "../data/wellbeing";
-import { createCheck, itemAverages, nextCheckDate, parseChecks, scoreWellbeing, wellbeingBand, wellbeingTrend, type WellbeingCheck } from "../lib/wellbeing";
+import { addCheck, createCheck, itemAverages, parseChecks, scoreWellbeing, wellbeingBand, wellbeingTrend, type WellbeingCheck } from "../lib/wellbeing";
 
-const check = (id: string, date: string, answers: WellbeingValue[]): WellbeingCheck => ({ id, takenAt: new Date(date).toISOString(), version: WELLBEING_VERSION, answers });
+const check = (id: string, date: string, answers: WellbeingValue[], period: WellbeingCheck["period"] = "day"): WellbeingCheck => ({ id, takenAt: new Date(date).toISOString(), version: WELLBEING_VERSION, period, answers });
 
 test("score is raw sum times four with reference bands at 28 and 50", () => {
   assert.deepEqual(scoreWellbeing([5, 5, 5, 5, 5]), { raw: 25, score: 100, band: "steady", lowItems: [] });
@@ -39,9 +39,24 @@ test("parse keeps valid checks newest first and drops broken ones", () => {
   assert.equal(parseChecks("{}"), null);
 });
 
-test("next check date and item averages", () => {
+test("item averages across checks", () => {
   const checks = [check("a", "2026-10-01T12:00:00", [1, 2, 3, 4, 5]), check("b", "2026-10-11T12:00:00", [3, 2, 3, 4, 0])];
-  assert.equal(nextCheckDate(checks, 14)!.getDate(), 25);
-  assert.equal(nextCheckDate([], 14), null);
   assert.deepEqual(itemAverages(checks).map((item) => item.mean), [2, 2, 3, 4, 2.5]);
+});
+
+test("a second check on the same day and period replaces the first; other periods are kept", () => {
+  const morning = check("a", "2026-10-20T08:00:00", [1, 1, 1, 1, 1]);
+  const weekly = check("w", "2026-10-20T09:00:00", [2, 2, 2, 2, 2], "week");
+  const evening = check("b", "2026-10-20T21:00:00", [4, 4, 4, 4, 4]);
+  const next = check("c", "2026-10-21T08:00:00", [3, 3, 3, 3, 3]);
+  const list = [next, evening, weekly, morning].reduce<WellbeingCheck[]>((all, item) => addCheck(all, item), []);
+  assert.deepEqual(list.map((item) => item.id).sort(), ["a", "c", "w"]);
+  assert.deepEqual(addCheck([morning, weekly], evening).map((item) => item.id).sort(), ["b", "w"]);
+  assert.deepEqual(wellbeingTrend([morning, weekly, next], "day").map((point) => point.id), ["a", "c"]);
+});
+
+test("older checks without a period are read as the original two-week form", () => {
+  const legacy = { id: "old", takenAt: new Date("2026-09-01").toISOString(), version: WELLBEING_VERSION, answers: [3, 3, 3, 3, 3] };
+  assert.equal(parseChecks(JSON.stringify([legacy]))![0].period, "twoWeeks");
+  assert.equal(parseChecks(JSON.stringify([{ ...legacy, period: "month" }]))!.length, 0);
 });

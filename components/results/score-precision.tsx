@@ -19,10 +19,8 @@ function stacked(values: readonly number[]) {
  * 범위가 넓으면 문항마다 답이 엇갈렸다는 뜻이라 점수를 한 숫자로 단정하지 않도록 돕습니다.
  */
 export function ScorePrecision({ id, result }: { id: ModuleId; result: ModuleResult }) {
-  const scales = result.module === "reaction"
-    ? result.result.dimensions.map((item) => ({ id: item.dimension as string, score: item.score, evidence: item.evidence }))
-    : result.profile.result.scales.map((item) => ({ id: item.scale as string, score: item.score, evidence: item.evidence }));
-  const rows = scales.map((scale) => scalePrecision(scale.id, scale.score, scale.evidence));
+  const scales = result.profile.result.scales.map((item) => ({ id: item.scale as string, score: item.score, evidence: item.evidence }));
+  const rows = scales.map((scale) => scalePrecision(scale.id, scale.score, scale.evidence, result.profile.result.points));
   const names = new Map(assessmentModules[id].scales.map((meta) => [meta.id as string, meta.shortName]));
   const shape = profileShape(rows.map((row) => row.score));
   const shapeText = shape.scatter < 10 ? "척도끼리 점수 차이가 작은 고른 프로필이에요" : shape.scatter >= 20 ? "높고 낮은 척도가 뚜렷하게 갈리는 프로필이에요" : "몇몇 척도가 두드러지는 프로필이에요";

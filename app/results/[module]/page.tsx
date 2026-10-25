@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ModuleResultView } from "@/components/results/module-result-view";
-import { assessmentModules, isModuleId, moduleIds } from "@/data/modules";
+import { assessmentModules, isFormId, isModuleId, moduleIds } from "@/data/modules";
 
 export const dynamicParams = false;
 
@@ -16,9 +16,9 @@ export async function generateMetadata({ params }: { params: Promise<{ module: s
 
 export default async function ModuleResultPage({ params, searchParams }: {
   params: Promise<{ module: string }>;
-  searchParams: Promise<{ example?: string | string[] }>;
+  searchParams: Promise<{ example?: string | string[]; form?: string | string[] }>;
 }) {
   const [{ module: id }, query] = await Promise.all([params, searchParams]);
   if (!isModuleId(id)) notFound();
-  return <ModuleResultView id={id} example={query.example === "1"} />;
+  return <ModuleResultView id={id} example={query.example === "1"} form={isFormId(query.form) ? query.form : undefined} />;
 }

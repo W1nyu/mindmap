@@ -1,12 +1,11 @@
-import type { LikertInstrument, LikertItem } from "../types/assessment";
+import { accuracy5, buildInstrument } from "./instrument-kit";
 import { traitIds, type TraitId, type TraitMeta } from "../types/traits";
 
-export const TRAIT_QUESTIONNAIRE_VERSION = "selfmap-traits-20-v1";
-
 /**
- * 성격 5요인 경향. IPIP(International Personality Item Pool, public domain)의
- * Mini-IPIP(Donnellan 외, 2006) 문항을 한국어로 각색했습니다. 개방성은 역채점 균형을 위해
- * IPIP 50문항판의 "Am full of ideas" 문항으로 1개를 바꿨습니다. 한국어판 타당화는 거치지 않았습니다.
+ * 성격 5요인: IPIP(International Personality Item Pool, 공개 도메인) 문항.
+ * 간편 검사는 Mini-IPIP 20문항(Donnellan 외, 2006), 심층 검사는 IPIP Big-Five 요인 지표 50문항(Goldberg, 1992).
+ * 두 판 모두 원 문항 순서와 채점 방향을 따릅니다. 50문항판의 네 번째 요인은 원래 ‘정서 안정성’이라
+ * 신경성으로 쓰기 위해 채점 방향을 반대로 바꿨습니다(Mini-IPIP와 같은 방식). 문장은 SelfMap이 옮긴 한국어입니다.
  */
 export const traitMeta = [
   {
@@ -46,7 +45,7 @@ export const traitMeta = [
     highChallenge: "다른 사람을 챙기느라 내 필요를 뒤로 미룰 수 있어요.",
   },
   {
-    id: "negativeEmotionality", name: "정서적 민감성", shortName: "정서 민감성",
+    id: "neuroticism", name: "신경성(정서적 민감성)", shortName: "신경성",
     description: "불안, 속상함 같은 감정을 얼마나 자주·강하게 느끼는지",
     lowPole: "감정 변화가 잔잔한", highPole: "감정을 섬세하게 느끼는",
     lowStrength: "압박 속에서도 차분함을 유지하는 안정감",
@@ -56,48 +55,88 @@ export const traitMeta = [
   },
 ] as const satisfies readonly TraitMeta[];
 
-const itemSpecs: Record<TraitId, readonly (readonly [string, boolean])[]> = {
-  openness: [
-    ["상상력이 풍부한 편이다.", false],
-    ["추상적인 생각에는 별로 흥미가 없다.", true],
-    ["새로운 아이디어가 자주 떠오른다.", false],
-    ["상상력이 그리 풍부하지 않은 편이다.", true],
-  ],
-  conscientiousness: [
-    ["해야 할 일을 미루지 않고 바로 처리한다.", false],
-    ["물건을 제자리에 두는 것을 자주 잊는다.", true],
-    ["질서 있고 정돈된 상태를 좋아한다.", false],
-    ["일을 어수선하게 벌여 놓을 때가 많다.", true],
-  ],
-  extraversion: [
-    ["모임에서 분위기를 띄우는 역할을 하는 편이다.", false],
-    ["말수가 적은 편이다.", true],
-    ["모임에서 여러 사람과 두루 이야기를 나눈다.", false],
-    ["여럿이 있을 때 눈에 띄지 않게 뒤에 있는 편이다.", true],
-  ],
-  agreeableness: [
-    ["다른 사람의 감정에 공감하는 편이다.", false],
-    ["다른 사람의 고민에는 별로 관심이 가지 않는다.", true],
-    ["다른 사람의 감정을 내 일처럼 느낄 때가 많다.", false],
-    ["다른 사람에게 크게 관심을 두지 않는 편이다.", true],
-  ],
-  negativeEmotionality: [
-    ["기분의 변화가 잦은 편이다.", false],
-    ["대부분의 시간 동안 마음이 편안하다.", true],
-    ["쉽게 속상해지는 편이다.", false],
-    ["울적한 기분을 느끼는 일이 드물다.", true],
-  ],
-};
-
-/** 같은 요인 문항이 다섯 칸 간격으로 나오도록 요인을 돌아가며 배치합니다. */
-export const traitQuestions: readonly LikertItem<TraitId>[] = [0, 1, 2, 3].flatMap((round) => traitIds.map((trait) => ({
-  id: `traits-${trait}-${round + 1}`, kind: "likert" as const, text: itemSpecs[trait][round][0],
-  scale: trait, reverse: itemSpecs[trait][round][1], weight: 1,
-})));
-
-export const traitInstrument: LikertInstrument<TraitId> = {
-  id: "traits",
-  version: TRAIT_QUESTIONNAIRE_VERSION,
+/** Mini-IPIP 20문항(원 순서). */
+export const miniIpip = buildInstrument<TraitId>({
+  id: "mini-ipip", version: "mini-ipip-ko-selfmap-v1", options: accuracy5,
   scaleIds: traitIds,
-  items: traitQuestions,
-};
+  items: [
+    ["모임에서 분위기를 띄우는 편이다.", "extraversion"],
+    ["다른 사람의 감정에 공감한다.", "agreeableness"],
+    ["해야 할 집안일을 바로 해치운다.", "conscientiousness"],
+    ["기분 변화가 심하다.", "neuroticism"],
+    ["상상력이 풍부하다.", "openness"],
+    ["말을 많이 하지 않는다.", "extraversion", true],
+    ["다른 사람의 문제에 관심이 없다.", "agreeableness", true],
+    ["물건을 제자리에 두는 것을 자주 잊는다.", "conscientiousness", true],
+    ["대부분의 시간에 마음이 편안하다.", "neuroticism", true],
+    ["추상적인 개념에 관심이 없다.", "openness", true],
+    ["모임에서 여러 사람과 이야기를 나눈다.", "extraversion"],
+    ["다른 사람의 감정을 함께 느낀다.", "agreeableness"],
+    ["정리정돈을 좋아한다.", "conscientiousness"],
+    ["쉽게 기분이 상한다.", "neuroticism"],
+    ["추상적인 개념을 이해하기 어렵다.", "openness", true],
+    ["앞에 나서지 않고 뒤에 있는 편이다.", "extraversion", true],
+    ["다른 사람에게 별로 관심이 없다.", "agreeableness", true],
+    ["일을 엉망으로 만든다.", "conscientiousness", true],
+    ["우울한 기분이 드는 일이 드물다.", "neuroticism", true],
+    ["상상력이 부족하다.", "openness", true],
+  ],
+});
+
+/** IPIP 50문항 Big-Five 요인 지표(원 순서). 원 키: (1)외향성 (2)우호성 (3)성실성 (4)정서 안정성 (5)지성·상상력. */
+export const ipip50 = buildInstrument<TraitId>({
+  id: "ipip50", version: "ipip50-ko-selfmap-v1", options: accuracy5,
+  scaleIds: traitIds,
+  items: [
+    ["모임에서 분위기를 띄우는 편이다.", "extraversion"],
+    ["다른 사람에 대한 걱정을 별로 하지 않는다.", "agreeableness", true],
+    ["항상 준비가 되어 있다.", "conscientiousness"],
+    ["쉽게 스트레스를 받는다.", "neuroticism"],
+    ["어휘력이 풍부하다.", "openness"],
+    ["말을 많이 하지 않는다.", "extraversion", true],
+    ["사람들에게 관심이 많다.", "agreeableness"],
+    ["물건을 여기저기 늘어놓는다.", "conscientiousness", true],
+    ["대부분의 시간에 마음이 편안하다.", "neuroticism", true],
+    ["추상적인 개념을 이해하기 어렵다.", "openness", true],
+    ["사람들과 있을 때 편안하다.", "extraversion"],
+    ["사람들에게 모욕적인 말을 한다.", "agreeableness", true],
+    ["세부 사항에 주의를 기울인다.", "conscientiousness"],
+    ["이런저런 걱정을 한다.", "neuroticism"],
+    ["상상력이 풍부하다.", "openness"],
+    ["앞에 나서지 않고 뒤에 있는 편이다.", "extraversion", true],
+    ["다른 사람의 감정에 공감한다.", "agreeableness"],
+    ["일을 엉망으로 만든다.", "conscientiousness", true],
+    ["우울한 기분이 드는 일이 드물다.", "neuroticism", true],
+    ["추상적인 개념에 관심이 없다.", "openness", true],
+    ["먼저 대화를 시작한다.", "extraversion"],
+    ["다른 사람의 문제에 관심이 없다.", "agreeableness", true],
+    ["해야 할 집안일을 바로 해치운다.", "conscientiousness"],
+    ["쉽게 마음이 동요한다.", "neuroticism"],
+    ["좋은 아이디어를 잘 낸다.", "openness"],
+    ["할 말이 별로 없다.", "extraversion", true],
+    ["마음이 여리고 따뜻하다.", "agreeableness"],
+    ["물건을 제자리에 두는 것을 자주 잊는다.", "conscientiousness", true],
+    ["쉽게 기분이 상한다.", "neuroticism"],
+    ["상상력이 부족하다.", "openness", true],
+    ["모임에서 여러 사람과 이야기를 나눈다.", "extraversion"],
+    ["다른 사람에게 별로 관심이 없다.", "agreeableness", true],
+    ["정리정돈을 좋아한다.", "conscientiousness"],
+    ["기분이 자주 바뀐다.", "neuroticism"],
+    ["이해가 빠르다.", "openness"],
+    ["주목받는 것을 좋아하지 않는다.", "extraversion", true],
+    ["다른 사람을 위해 시간을 낸다.", "agreeableness"],
+    ["맡은 일을 게을리한다.", "conscientiousness", true],
+    ["기분 변화가 심하다.", "neuroticism"],
+    ["어려운 단어를 쓴다.", "openness"],
+    ["관심의 중심이 되어도 개의치 않는다.", "extraversion"],
+    ["다른 사람의 감정을 함께 느낀다.", "agreeableness"],
+    ["일정에 따라 생활한다.", "conscientiousness"],
+    ["쉽게 짜증이 난다.", "neuroticism"],
+    ["생각을 깊이 되돌아보는 시간을 갖는다.", "openness"],
+    ["낯선 사람 앞에서 조용하다.", "extraversion", true],
+    ["사람들을 편안하게 해 준다.", "agreeableness"],
+    ["일할 때 꼼꼼하고 엄격하다.", "conscientiousness"],
+    ["자주 우울하다.", "neuroticism"],
+    ["아이디어가 넘친다.", "openness"],
+  ],
+});

@@ -14,18 +14,16 @@ test("terrain sites are unique, inside the canvas, and cover every scale shown o
     assert.ok(site.x > 0 && site.x < 1 && site.y > 0 && site.y < 1, `${site.scale} out of bounds`);
   }
   const peaks = terrainPeaks(allExamples());
-  assert.equal(peaks.length, 8 + 3 + 5 + 2);
+  assert.equal(peaks.length, 6 + 3 + 5 + 2);
 });
 
 test("peak heights are the deterministic scale scores, never invented", () => {
   const results = allExamples();
   const peaks = terrainPeaks(results);
-  const reaction = results.reaction!;
-  assert.equal(reaction.module, "reaction");
-  if (reaction.module === "reaction") {
-    for (const dimension of reaction.result.dimensions) {
-      assert.equal(peaks.find((peak) => peak.id === `reaction:${dimension.dimension}`)?.score, dimension.score);
-    }
+  const emotion = results.emotion!;
+  assert.equal(emotion.module, "emotion");
+  for (const scale of emotion.profile.result.scales) {
+    assert.equal(peaks.find((peak) => peak.id === `emotion:${scale.scale}`)?.score, scale.score);
   }
   const defense = results.defense!;
   if (defense.module === "defense") {
@@ -39,7 +37,7 @@ test("only completed modules raise peaks", () => {
   assert.deepEqual(terrainPeaks({}), []);
 });
 
-test("routes only connect existing peaks and map defense scales to their tier", () => {
+test("routes only connect existing peaks", () => {
   const results = allExamples();
   const peaks = terrainPeaks(results);
   const ids = new Set(peaks.map((peak) => peak.id));

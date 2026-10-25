@@ -1,4 +1,4 @@
-import { defenseMechanisms, defenseTiers } from "../data/defense-mechanisms";
+import { defenseTiers } from "../data/defense-mechanisms";
 import { moduleIds, assessmentModules, type ModuleId } from "../data/modules";
 import { terrainSites } from "../data/terrain-layout";
 import { integratedInsights, scaleScores, type ModuleResults } from "./integration";
@@ -41,8 +41,6 @@ export interface TerrainModel {
   height: number;
 }
 
-const tierOfDefense = new Map<string, string>(defenseMechanisms.map((item) => [item.id, item.tier]));
-
 /** 완료한 모듈의 척도만 봉우리로 만듭니다. 방어기제는 세 수준 점수를 씁니다. */
 export function terrainPeaks(results: ModuleResults): TerrainPeak[] {
   const peaks: TerrainPeak[] = [];
@@ -64,10 +62,10 @@ export function terrainPeaks(results: ModuleResults): TerrainPeak[] {
   return peaks;
 }
 
-/** 모듈 간 연결 해석 중 성립한 것을 봉우리 사이의 길로 바꿉니다. 방어기제 척도는 해당 수준 봉우리로 이어집니다. */
+/** 모듈 간 연결 해석 중 성립한 것을 봉우리 사이의 길로 바꿉니다. 방어기제 조건은 스타일 봉우리로 이어집니다. */
 export function terrainRoutes(results: ModuleResults, peaks: readonly TerrainPeak[]): TerrainRoute[] {
   const ids = new Set(peaks.map((peak) => peak.id));
-  const peakId = (module: ModuleId, scale: string) => `${module}:${module === "defense" ? tierOfDefense.get(scale) ?? scale : scale}`;
+  const peakId = (module: ModuleId, scale: string) => `${module}:${scale}`;
   const routes: TerrainRoute[] = [];
   for (const { rule, evidence } of integratedInsights(results).matched) {
     const ends = [...new Set(evidence.map((item) => peakId(item.module, item.scale)))].filter((id) => ids.has(id));

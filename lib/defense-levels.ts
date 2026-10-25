@@ -1,11 +1,12 @@
-import { dmrsLevels, type DmrsLevelMeta } from "../data/defense-levels";
+import { dmrsLevels } from "../data/defense-levels";
+import { defenseMeta } from "../data/defense-mechanisms";
 import type { ScaleScore } from "../types/assessment";
-import type { DefenseId } from "../types/defense";
+import type { DefenseId, DmrsLevel } from "../types/defense";
 import { largestRemainder } from "./interpretation";
 
 export interface DmrsLevelScore {
-  level: DmrsLevelMeta["level"];
-  /** 이 설문에서 묻는 수준인지 */
+  level: DmrsLevel;
+  /** 이 검사지에서 묻는 수준인지 */
   measured: boolean;
   /** 속한 방어 점수의 평균(반올림). 묻지 않는 수준은 null */
   score: number | null;
@@ -25,20 +26,17 @@ export interface DmrsProfile {
  * 가중 평균 = Σ(수준 × 방어 점수) ÷ Σ방어 점수. ODF의 ‘수준 × 비율’ 구조를 자기보고 점수에 옮긴 참고 지표예요.
  */
 export function dmrsProfile(scales: readonly ScaleScore<DefenseId>[]): DmrsProfile {
-  const scoreOf = new Map(scales.map((scale) => [scale.scale, scale.score]));
-  const sums = dmrsLevels.map((meta) => meta.defenses.reduce((sum, id) => sum + (scoreOf.get(id) ?? 0), 0));
+  const groups = dmrsLevels.map((meta) => scales.filter((scale) => defenseMeta(scale.scale).level === meta.level));
+  const sums = groups.map((group) => group.reduce((sum, scale) => sum + scale.score, 0));
   const total = sums.reduce((sum, value) => sum + value, 0);
   const shares = total > 0 ? largestRemainder(sums) : sums.map(() => 0);
-  const levels = dmrsLevels.map((meta, index) => {
-    const defenses = meta.defenses.map((id) => ({ defense: id, score: scoreOf.get(id) ?? 0 }));
-    return {
-      level: meta.level,
-      measured: defenses.length > 0,
-      score: defenses.length ? Math.round(sums[index] / defenses.length) : null,
-      share: shares[index],
-      defenses,
-    };
-  });
+  const levels = dmrsLevels.map((meta, index) => ({
+    level: meta.level,
+    measured: groups[index].length > 0,
+    score: groups[index].length ? Math.round(sums[index] / groups[index].length) : null,
+    share: shares[index],
+    defenses: groups[index].map((scale) => ({ defense: scale.scale, score: scale.score })),
+  }));
   const index = total > 0 ? Math.round((dmrsLevels.reduce((sum, meta, at) => sum + meta.level * sums[at], 0) / total) * 100) / 100 : null;
   return { levels, index };
 }

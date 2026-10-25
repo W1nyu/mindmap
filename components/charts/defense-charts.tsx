@@ -10,19 +10,19 @@ const tierClass = (tier: DefenseTierId) => `tier-${tier}`;
 /** 세 수준의 점수 타일과 상대 구성비(합 100) 막대. 색 외에 수준 이름과 수치를 항상 함께 표시합니다. */
 export function TierSummary({ profile }: { profile: DefenseProfile }) {
   return <section className="viz-card" aria-labelledby="tier-summary-title">
-    <div className="viz-heading"><div><h2 id="tier-summary-title">세 가지 수준의 방어</h2></div><span className="subtle-label">수준별 문항 평균 · 0–100</span></div>
+    <div className="viz-heading"><div><h2 id="tier-summary-title">세 가지 방어 스타일</h2></div><span className="subtle-label">평균 1–9</span></div>
     <div className="tier-tiles">{profile.tiers.map((tier) => {
       const meta = tierMeta(tier.tier);
       return <article key={tier.tier} className={`tier-tile ${tierClass(tier.tier)}`}>
         <span className="tier-swatch" aria-hidden="true" />
         <h3>{meta.name}</h3>
-        <p className="tier-score"><strong>{tier.score}</strong><small> / 100 · {bandLabels[scoreBand(tier.score)]}</small></p>
+        <p className="tier-score"><strong>{tier.mean.toFixed(1)}</strong><small> / 9 · {meta.academicName}</small></p>
         <div className="mini-track" aria-hidden="true"><span style={{ width: `${tier.score}%` }} /></div>
         <p className="tier-defenses">{tier.defenses.map((id) => defenseMeta(id).name).join(" · ")}</p>
       </article>;
     })}</div>
     {profile.composition ? <div className="composition">
-      <p className="viz-caption">세 수준 평균을 합 100으로 나눈 상대 비중</p>
+      <p className="viz-caption">세 스타일 점수의 상대 비중</p>
       <div className="composition-bar" role="img" aria-label={`상대 비중: ${profile.composition.map((item) => `${tierMeta(item.tier).name} ${item.share}%`).join(", ")}`}>
         {profile.composition.filter((item) => item.share > 0).map((item) => <span key={item.tier} className={tierClass(item.tier)} style={{ flexGrow: item.share }} data-tip={`${tierMeta(item.tier).name} ${item.share}%`}>{item.share >= 12 ? `${item.share}%` : ""}</span>)}
       </div>
@@ -31,22 +31,22 @@ export function TierSummary({ profile }: { profile: DefenseProfile }) {
   </section>;
 }
 
-/** 15개 방어기제를 수준별로 묶은 사다리. 수준 안에서는 점수 내림차순(동점은 기본 순서)입니다. */
+/** 방어기제를 스타일별로 묶은 사다리. 스타일 안에서는 점수 내림차순(동점은 기본 순서)입니다. */
 export function DefenseLadder({ profile }: { profile: DefenseProfile }) {
   return <section className="viz-card" aria-labelledby="ladder-title">
-    <div className="viz-heading"><div><h2 id="ladder-title">15가지 방어기제 사다리</h2></div></div>
+    <div className="viz-heading"><div><h2 id="ladder-title">{profile.result.scales.length}가지 방어기제</h2></div></div>
     <div className="ladder">{profile.tiers.map((tier) => {
       const rows = profile.result.scales.filter((scale) => tier.defenses.includes(scale.scale))
         .map((scale, index) => ({ scale, index })).sort((a, b) => b.scale.score - a.scale.score || a.index - b.index).map(({ scale }) => scale);
       return <div key={tier.tier} className={`ladder-group ${tierClass(tier.tier)}`}>
-        <h3><i aria-hidden="true" />{tierMeta(tier.tier).name} <small>{tier.score}</small></h3>
+        <h3><i aria-hidden="true" />{tierMeta(tier.tier).name} <small>{tier.mean.toFixed(1)}</small></h3>
         <ul>{rows.map((scale) => {
           const meta = defenseMeta(scale.scale);
           const band = bandLabels[scoreBand(scale.score)];
-          return <li key={scale.scale} data-tip={`${meta.name}(${meta.englishName}) · ${scale.score}점 · ${band} · 응답 ${scale.evidence.map((item) => item.rawValue).join(", ")}`}>
+          return <li key={scale.scale} data-tip={`${meta.name}(${meta.englishName}) · 평균 ${scale.mean.toFixed(1)} · ${band} · 응답 ${scale.evidence.map((item) => item.rawValue + 1).join(", ")}`}>
             <span className="ladder-name">{meta.name}</span>
             <span className="ladder-track" aria-hidden="true"><span style={{ width: `${scale.score}%` }} /></span>
-            <span className="ladder-value">{scale.score}<small>{band}</small></span>
+            <span className="ladder-value">{scale.mean.toFixed(1)}<small>{band}</small></span>
           </li>;
         })}</ul>
       </div>;
@@ -84,13 +84,13 @@ export function DmrsHierarchy({ profile }: { profile: DefenseProfile }) {
             {level.measured
               ? <ul className="dmrs-chips">{[...level.defenses].sort((a, b) => b.score - a.score).map((item) => <li key={item.defense}>{defenseMeta(item.defense).name} <b>{item.score}</b></li>)}</ul>
               : <p className="dmrs-note">{meta.description}</p>}
-            <span className="sr-only">{level.measured ? `${level.level}단계 ${meta.name}: 전체 몫 ${level.share}%, 평균 ${level.score}점` : `${level.level}단계 ${meta.name}: 이 설문에서 묻지 않는 수준`}</span>
+            <span className="sr-only">{level.measured ? `${level.level}단계 ${meta.name}: 전체 몫 ${level.share}%, 평균 ${level.score}점` : `${level.level}단계 ${meta.name}: 이 검사지에서 묻지 않는 수준`}</span>
           </li>;
         })}
       </ol>
     </div>
     <details className="dmrs-details"><summary>각 단계는 어떤 방식인가요?</summary>
-      <dl>{dmrsLevels.filter((meta) => meta.defenses.length > 0).map((meta) => <div key={meta.level}><dt>{meta.level}단계 · {meta.name}</dt><dd>{meta.description}</dd></div>)}</dl>
+      <dl>{dmrsLevels.filter((meta) => dmrs.levels.find((level) => level.level === meta.level)?.measured).map((meta) => <div key={meta.level}><dt>{meta.level}단계 · {meta.name}</dt><dd>{meta.description}</dd></div>)}</dl>
     </details>
     <p className="viz-caption">자기보고 점수로 만든 참고 지표예요. 누구나 상황에 따라 여러 단계를 오가요.</p>
   </section>;

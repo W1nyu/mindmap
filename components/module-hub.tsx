@@ -2,42 +2,32 @@
 
 import Link from "next/link";
 import { Icon } from "@/components/icon";
-import { assessmentModules, moduleIds, type ModuleId } from "@/data/modules";
-import { moduleStores } from "@/lib/module-stores";
-import { instrumentResponses } from "@/lib/session";
-import type { SessionSnapshot } from "@/lib/session-store";
+import { useModuleProgress, type ModuleProgress } from "@/components/use-module-progress";
+import { assessmentModules, formIds, formLabels, moduleIds } from "@/data/modules";
 
-function ModuleCard({ id, state }: { id: ModuleId; state: SessionSnapshot }) {
-  const assessment = assessmentModules[id];
-  const total = assessment.instrument.items.length;
-  const answered = state.session ? instrumentResponses(assessment.instrument, state.session).length : 0;
-  const completed = Boolean(state.session?.completed);
-  const status = !state.ready ? "확인 중" : completed ? "완료" : answered > 0 ? `${answered} / ${total} 응답` : "시작 전";
-  return <article className={`module-card module-${id} ${completed ? "is-complete" : ""}`}>
-    <div className="module-card-top"><span className="module-region"><i /></span><span className={`module-status ${completed ? "done" : answered > 0 ? "progress" : ""}`}>{completed && <Icon name="check" size={12} />} {status}</span></div>
+function ModuleCard({ progress }: { progress: ModuleProgress }) {
+  const assessment = assessmentModules[progress.id];
+  return <article className={`module-card module-${progress.id} ${progress.completed ? "is-complete" : ""}`}>
+    <div className="module-card-top"><span className="module-region"><i /></span>{progress.completed && <Link className="text-link" href={`/results/${progress.id}`}>결과 보기 <Icon name="chevron" size={14} /></Link>}</div>
     <h2>{assessment.title}</h2>
     <p className="module-tagline">{assessment.tagline}</p>
-    <p className="module-meta">{total}문항 · 약 {assessment.estimatedMinutes}분</p>
-    <div className="module-progress" aria-hidden="true"><span style={{ width: `${(answered / total) * 100}%` }} /></div>
-    <div className="module-actions">
-      <Link className="button button-primary" href={`/questions/${id}`}>{completed ? "응답 수정" : answered > 0 ? "이어서 하기" : "시작하기"} <Icon name="arrow" size={16} /></Link>
-      {completed ? <Link className="text-link" href={`/results/${id}`}>결과 보기 <Icon name="chevron" size={14} /></Link>
-        : <Link className="text-link" href={`/results/${id}?example=1`}>예시 결과 <Icon name="chevron" size={14} /></Link>}
-    </div>
+    <ul className="form-list">{formIds.map((form) => {
+      const meta = assessment.forms[form];
+      const state = progress.forms[form];
+      const status = state.completed ? "완료" : state.answered > 0 ? `${state.answered}/${state.total}` : null;
+      return <li key={form}><Link href={`/questions/${progress.id}?form=${form}`} className={`form-option ${form}`}>
+        <span className="form-option-head"><strong>{formLabels[form]}</strong>{status && <em className={state.completed ? "done" : ""}>{state.completed && <Icon name="check" size={12} />} {status}</em>}</span>
+        <span className="form-option-meta">{meta.name} · {meta.instrument.items.length}문항 · 약 {meta.estimatedMinutes}분</span>
+      </Link></li>;
+    })}</ul>
   </article>;
 }
 
-/** 모듈별 진행 상태. 각 모듈은 독립적으로 응답하고 결과를 볼 수 있습니다. */
+/** 모듈별 진행 상태. 각 모듈은 간편·심층 중 원하는 검사로 결과를 볼 수 있습니다. */
 export function ModuleHub() {
-  const states: Record<ModuleId, SessionSnapshot> = {
-    reaction: moduleStores.reaction.useSession(),
-    defense: moduleStores.defense.useSession(),
-    traits: moduleStores.traits.useSession(),
-    attachment: moduleStores.attachment.useSession(),
-  };
-  const completedCount = moduleIds.filter((id) => states[id].session?.completed).length;
+  const { ready, modules, completedCount } = useModuleProgress();
   return <>
-    {completedCount > 0 && <p className="hub-summary" role="status">{moduleIds.length}개 중 {completedCount}개 완료</p>}
-    <div className="module-grid">{moduleIds.map((id) => <ModuleCard key={id} id={id} state={states[id]} />)}</div>
+    {ready && completedCount > 0 && <p className="hub-summary" role="status">{moduleIds.length}개 중 {completedCount}개 완료</p>}
+    <div className="module-grid">{modules.map((progress) => <ModuleCard key={progress.id} progress={progress} />)}</div>
   </>;
 }

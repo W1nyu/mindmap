@@ -355,7 +355,7 @@ section[aria-labelledby] > .section-heading { margin-bottom: 16px; }
 .terrain-peak:focus-visible .hit { stroke: var(--primary); stroke-width: 2; stroke-dasharray: 3 3; }
 .terrain-peak.selected .peak-label { fill: var(--primary-text); }
 .terrain-peak.faded { opacity: .35; }
-.module-reaction { --module-color: #7a5ec4; }
+.module-emotion { --module-color: #7a5ec4; }
 .module-defense { --module-color: var(--tier-adaptive); }
 .module-traits { --module-color: #b8678f; }
 .module-attachment { --module-color: #3f86a6; }
@@ -1269,3 +1269,66 @@ section[aria-labelledby] > .section-heading { margin-bottom: 16px; }
 .wb-help svg { flex-shrink: 0; margin-top: 3px; }
 .page-footer { justify-content: center; }
 .dash-hero { align-items: center; }
+
+/* ---------- 공인 척도 검사 · 유형 카드 ---------- */
+.likert-options { grid-template-columns: repeat(var(--count, 5), minmax(0, 1fr)); }
+.likert-options.wide { gap: 6px; }
+.likert-options.wide .likert-option { padding: 14px 4px; font-size: calc(12.5px * var(--fs)); }
+.likert-options.wide .likert-number { width: 28px; height: 28px; }
+.form-chip { display: inline-block; margin-left: 8px; padding: 3px 10px; border-radius: 99px; background: var(--primary-soft); color: var(--primary-text); font-family: var(--font-body); font-size: calc(14px * var(--fs)); font-weight: 600; vertical-align: middle; }
+.form-switch { margin: 4px 0 0; }
+.form-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
+.form-option { display: grid; gap: 2px; padding: 12px 14px; border-radius: var(--radius-m); border: 1px solid var(--line-strong); background: var(--card-2); color: var(--ink); transition: border-color .15s, background-color .15s; }
+.form-option:hover { border-color: var(--primary); background: var(--primary-soft); }
+.form-option.deep { border-style: dashed; }
+.form-option-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.form-option-head strong { font-size: calc(15.5px * var(--fs)); }
+.form-option-head em { display: inline-flex; align-items: center; gap: 4px; font-style: normal; font-size: calc(12.5px * var(--fs)); color: var(--muted); font-variant-numeric: tabular-nums; }
+.form-option-head em.done { color: var(--good-text); font-weight: 600; }
+.form-option-meta { font-size: calc(13px * var(--fs)); color: var(--muted); }
+.type-deck { margin-bottom: 4px; }
+.type-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.type-card { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 20px; border-radius: var(--radius-l); background: linear-gradient(160deg, color-mix(in srgb, var(--module-color, var(--primary)) 14%, var(--card)), var(--card) 70%); border: 1px solid color-mix(in srgb, var(--module-color, var(--primary)) 30%, var(--line)); color: var(--ink); }
+.type-card-module { display: inline-flex; align-items: center; gap: 6px; font-size: calc(12.5px * var(--fs)); font-weight: 600; color: var(--muted); }
+.type-card-module i { width: 9px; height: 9px; border-radius: 50%; background: var(--module-color, var(--primary)); }
+.type-card h3 { margin: 6px 0 0; font-family: var(--font-display); font-size: calc(24px * var(--fs)); line-height: 1.25; }
+.type-card-academic { margin: 0; font-size: calc(12.5px * var(--fs)); color: var(--primary-text); font-weight: 600; }
+.type-card-summary { margin: 6px 0 0; font-size: calc(14px * var(--fs)); line-height: 1.6; color: var(--text-2); }
+.type-card-basis { margin: auto 0 0; padding-top: 8px; font-size: calc(12px * var(--fs)); color: var(--faint); font-variant-numeric: tabular-nums; }
+.type-card .text-link { align-self: flex-start; padding: 2px 0; font-size: calc(13.5px * var(--fs)); }
+.type-card.empty { align-items: flex-start; border-style: dashed; background: var(--card-2); }
+.type-card.empty h3 { color: var(--faint); }
+.type-card.large { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); grid-template-areas: "module module" "name summary" "academic summary" "basis basis"; align-items: start; gap: 2px 28px; padding: 24px 28px; margin-bottom: 4px; }
+.type-card.large .type-card-module { grid-area: module; }
+.type-card.large h3 { grid-area: name; font-size: calc(32px * var(--fs)); }
+.type-card.large .type-card-academic { grid-area: academic; }
+.type-card.large .type-card-summary { grid-area: summary; align-self: center; margin: 0; font-size: calc(16px * var(--fs)); }
+.type-card.large .type-card-basis { grid-area: basis; }
+.emotion-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.emotion-list li { padding: 10px 0; border-bottom: 1px solid var(--line); }
+.emotion-row-head { display: flex; justify-content: space-between; align-items: baseline; }
+.emotion-row-head h3 { font-size: calc(15.5px * var(--fs)); }
+.emotion-row-head span { font-weight: 700; font-variant-numeric: tabular-nums; }
+.emotion-row-head small { font-weight: 400; color: var(--muted); }
+.emotion-list p { margin: 4px 0 0; font-size: calc(13.5px * var(--fs)); line-height: 1.6; color: var(--text-2); }
+.emotion-list li.hard .score-track span { background: var(--tier-inhibitory); }
+.emotion-list li.easy .score-track span { background: var(--tier-adaptive); }
+.plane-norm { stroke: var(--primary); stroke-width: 1.5; stroke-dasharray: 5 4; opacity: .7; }
+.plane-quadrant { fill: var(--faint); font-size: calc(11px * var(--fs)); font-weight: 600; }
+.trait-norm { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--primary); opacity: .55; transform: translateX(-1px); }
+.wb-period { display: inline-flex; gap: 4px; padding: 4px; margin-bottom: 14px; border-radius: 10px; background: var(--paper-2); }
+.wb-period button { padding: 7px 16px; border: 0; border-radius: 7px; background: none; color: var(--text-2); font-weight: 600; font-size: calc(14px * var(--fs)); }
+.wb-period button[aria-pressed="true"] { background: var(--card); color: var(--primary-text); box-shadow: var(--shadow-1); }
+.wb-period.small { margin: 0; }
+.wb-period.small button { padding: 5px 10px; font-size: calc(13px * var(--fs)); }
+.wb-history-date small { margin-left: 6px; color: var(--faint); }
+@media (max-width: 1180px) { .type-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  .likert-options.wide { grid-template-columns: repeat(var(--count), minmax(0, 1fr)); gap: 3px; }
+  .likert-options.wide .likert-option { padding: 10px 0; gap: 6px; }
+  .likert-options.wide .likert-label { display: none; }
+  .likert-options.wide .likert-number { width: 24px; height: 24px; font-size: calc(13px * var(--fs)); }
+  .type-card.large { grid-template-columns: minmax(0, 1fr); grid-template-areas: "module" "name" "academic" "summary" "basis"; }
+  .type-card.large .type-card-summary { margin-top: 8px; }
+}
+@media (max-width: 420px) { .type-grid { grid-template-columns: minmax(0, 1fr); } }

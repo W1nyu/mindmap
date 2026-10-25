@@ -2,7 +2,6 @@
 
 import { useSyncExternalStore } from "react";
 import type { QuestionnaireSession } from "@/types/psychology";
-import { parseSession, SESSION_STORAGE_KEY } from "@/lib/session";
 
 export interface SessionSnapshot {
   ready: boolean;
@@ -19,7 +18,7 @@ export interface SessionStore {
 
 const serverSnapshot: SessionSnapshot = { ready: false, session: null, storageAvailable: true, invalidSavedSession: false };
 
-/** 탭 단위 sessionStorage 키 하나를 React 상태와 연결합니다. 저장이 차단되면 메모리로 진행합니다. */
+/** 이 기기의 localStorage 키 하나를 React 상태와 연결합니다. 저장이 차단되면 메모리로 진행합니다. */
 export function createSessionStore(storageKey: string, parse: (raw: string) => QuestionnaireSession | null): SessionStore {
   let snapshot: SessionSnapshot = { ...serverSnapshot, ready: true };
   let lastRaw: string | null | undefined;
@@ -29,7 +28,7 @@ export function createSessionStore(storageKey: string, parse: (raw: string) => Q
   function getSnapshot(): SessionSnapshot {
     if (memoryOnly) return snapshot;
     try {
-      const raw = window.sessionStorage.getItem(storageKey);
+      const raw = window.localStorage.getItem(storageKey);
       if (raw !== lastRaw) {
         lastRaw = raw;
         const session = raw === null ? null : parse(raw);
@@ -59,8 +58,8 @@ export function createSessionStore(storageKey: string, parse: (raw: string) => Q
     const raw = session ? JSON.stringify(session) : null;
     if (!memoryOnly) {
       try {
-        if (raw === null) window.sessionStorage.removeItem(storageKey);
-        else window.sessionStorage.setItem(storageKey, raw);
+        if (raw === null) window.localStorage.removeItem(storageKey);
+        else window.localStorage.setItem(storageKey, raw);
         lastRaw = raw;
       } catch {
         memoryOnly = true;
@@ -76,9 +75,3 @@ export function createSessionStore(storageKey: string, parse: (raw: string) => Q
     clear: () => update(null),
   };
 }
-
-const reactionStore = createSessionStore(SESSION_STORAGE_KEY, parseSession);
-
-export const saveSession = reactionStore.save;
-export const clearSession = reactionStore.clear;
-export const useQuestionnaireSession = reactionStore.useSession;

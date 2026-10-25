@@ -1,84 +1,97 @@
-import { attachmentInstrument, attachmentMeta } from "./attachment";
+import { attachmentMeta, ecrR, ecrS } from "./attachment";
 import { defenseMechanisms } from "./defense-mechanisms";
-import { defenseInstrument } from "./defense-questions";
-import { dimensions } from "./dimensions";
-import { reactionInstrument } from "./questions";
-import { traitInstrument, traitMeta } from "./traits";
+import { dsq40, dsq60 } from "./defense-dsq";
+import { ders18, ders36, emotionMeta } from "./emotion";
+import { ipip50, miniIpip, traitMeta } from "./traits";
 import type { LikertInstrument, ScaleMeta } from "../types/assessment";
 
-export const moduleIds = ["reaction", "defense", "traits", "attachment"] as const;
+export const moduleIds = ["emotion", "defense", "traits", "attachment"] as const;
 export type ModuleId = (typeof moduleIds)[number];
+
+export const formIds = ["brief", "deep"] as const;
+export type FormId = (typeof formIds)[number];
+export const formLabels: Record<FormId, string> = { brief: "간편 검사", deep: "심층 검사" };
+
+/** 한 모듈의 검사지 하나. 간편과 심층은 같은 개념을 재는 공인 척도의 단축형과 전체형입니다. */
+export interface ModuleForm {
+  id: FormId;
+  /** 척도 이름(예: DERS-18) */
+  name: string;
+  instrument: LikertInstrument;
+  estimatedMinutes: number;
+  storageKey: string;
+  citation: string;
+}
 
 export interface AssessmentModule {
   id: ModuleId;
   title: string;
   tagline: string;
-  description: string;
-  estimatedMinutes: number;
-  storageKey: string;
-  instrument: LikertInstrument;
   scales: readonly ScaleMeta[];
   /** 문항 위에 척도 이름을 보여줄지. 방어기제처럼 이름이 응답을 유도할 수 있으면 숨깁니다. */
   showScaleLabel: boolean;
   questionHint: string;
-  basis: string;
+  forms: Record<FormId, ModuleForm>;
 }
 
+const form = (module: ModuleId, id: FormId, name: string, instrument: LikertInstrument, estimatedMinutes: number, citation: string): ModuleForm =>
+  ({ id, name, instrument, estimatedMinutes, citation, storageKey: `selfmap.v3.${module}.${id}` });
+
 export const assessmentModules: Record<ModuleId, AssessmentModule> = {
-  reaction: {
-    id: "reaction",
-    title: "반응 패턴",
-    tagline: "갈등과 평가의 순간, 나는 어떻게 반응할까",
-    description: "평가 민감성부터 관점 회복까지, 불편한 상황에서 나타나는 8가지 반응 경향을 살펴봐요.",
-    estimatedMinutes: 5,
-    storageKey: "selfmap.questionnaire",
-    instrument: reactionInstrument,
-    scales: dimensions,
-    showScaleLabel: true,
-    questionHint: "최근 일상에서의 경험을 떠올리며 가장 가까운 답을 골라보세요.",
-    basis: "SelfMap 자체 샘플 문항 · 8차원 × 4문항",
+  emotion: {
+    id: "emotion",
+    title: "감정 조절",
+    tagline: "속상한 순간, 감정을 어떻게 다루는지",
+    scales: emotionMeta,
+    showScaleLabel: false,
+    questionHint: "최근 몇 달 동안의 나를 떠올리며, 얼마나 자주 그런지 골라 주세요.",
+    forms: {
+      brief: form("emotion", "brief", "DERS-18", ders18, 3, "Victor & Klonsky (2016)"),
+      deep: form("emotion", "deep", "DERS-36", ders36, 6, "Gratz & Roemer (2004)"),
+    },
   },
   defense: {
     id: "defense",
-    title: "방어기제 프로필",
-    tagline: "마음이 나를 지키는 15가지 방식",
-    description: "스트레스 앞에서 마음이 자동으로 꺼내는 보호 전략을 성숙한 대처부터 즉각 보호형까지 세 수준으로 살펴봐요.",
-    estimatedMinutes: 7,
-    storageKey: "selfmap.defense",
-    instrument: defenseInstrument,
+    title: "방어기제",
+    tagline: "스트레스 앞에서 마음이 나를 지키는 방식",
     scales: defenseMechanisms.map((item) => ({ id: item.id, name: item.name, shortName: item.name, description: item.summary })),
     showScaleLabel: false,
-    questionHint: "힘들거나 불편했던 최근의 순간들을 떠올리며, 평소의 나에게 가까운 답을 골라보세요.",
-    basis: "Vaillant의 방어 위계 · DSM-IV 방어기능척도 구분 · 자체 작성 45문항",
+    questionHint: "각 문장에 얼마나 동의하는지 1(전혀 동의 안 함)부터 9(매우 동의)까지 골라 주세요. 정답은 없어요.",
+    forms: {
+      brief: form("defense", "brief", "DSQ-40", dsq40, 7, "Andrews, Singh & Bond (1993)"),
+      deep: form("defense", "deep", "DSQ-60", dsq60, 10, "Thygesen et al. (2008)"),
+    },
   },
   traits: {
     id: "traits",
-    title: "성격 5요인 경향",
+    title: "성격 5요인",
     tagline: "나의 기본 성향을 다섯 개의 축으로",
-    description: "개방성, 성실성, 외향성, 우호성, 정서적 민감성을 양쪽 끝 모두 강점이 있는 스펙트럼으로 살펴봐요.",
-    estimatedMinutes: 3,
-    storageKey: "selfmap.traits",
-    instrument: traitInstrument,
     scales: traitMeta,
     showScaleLabel: false,
-    questionHint: "지금의 나를 있는 그대로 떠올리며, 가장 가까운 답을 골라보세요.",
-    basis: "IPIP(public domain) Mini-IPIP 20문항 한국어 각색",
+    questionHint: "지금의 나를 있는 그대로 떠올리며, 나를 얼마나 잘 설명하는지 골라 주세요.",
+    forms: {
+      brief: form("traits", "brief", "Mini-IPIP", miniIpip, 3, "Donnellan et al. (2006)"),
+      deep: form("traits", "deep", "IPIP-50", ipip50, 7, "Goldberg (1992)"),
+    },
   },
   attachment: {
     id: "attachment",
-    title: "관계 애착 경향",
-    tagline: "가까운 관계에서 나는 어떻게 다가가고 물러설까",
-    description: "관계 불안과 친밀 회피, 두 개의 축 위에서 가까운 사람과의 거리를 다루는 나의 방식을 살펴봐요.",
-    estimatedMinutes: 2,
-    storageKey: "selfmap.attachment",
-    instrument: attachmentInstrument,
+    title: "관계 애착",
+    tagline: "가까운 관계에서 다가가고 물러서는 방식",
     scales: attachmentMeta,
     showScaleLabel: false,
-    questionHint: "연인, 가족, 가까운 친구 등 나에게 중요한 관계를 떠올리며 평소의 나에게 가까운 답을 골라보세요.",
-    basis: "성인 애착 2차원 모델(Brennan 외, 1998; Fraley 외, 2000) 참고 · 자체 작성 12문항",
+    questionHint: "연인 관계를 떠올려 주세요. 지금 연인이 없다면 가까운 사람과의 관계를 떠올려도 괜찮아요.",
+    forms: {
+      brief: form("attachment", "brief", "ECR-S", ecrS, 3, "Wei et al. (2007)"),
+      deep: form("attachment", "deep", "ECR-R", ecrR, 7, "Fraley, Waller & Brennan (2000)"),
+    },
   },
 };
 
 export function isModuleId(value: unknown): value is ModuleId {
   return typeof value === "string" && (moduleIds as readonly string[]).includes(value);
+}
+
+export function isFormId(value: unknown): value is FormId {
+  return value === "brief" || value === "deep";
 }

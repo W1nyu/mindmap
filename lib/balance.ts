@@ -1,17 +1,15 @@
 import { attachmentMeta } from "../data/attachment";
 import { defenseMeta } from "../data/defense-mechanisms";
-import { dimensions } from "../data/dimensions";
+import { emotionMeta } from "../data/emotion";
 import { assessmentModules, type ModuleId } from "../data/modules";
-import { recoveryTexts } from "../data/reaction-insights";
 import { traitMeta } from "../data/traits";
 import { integratedInsights, type ModuleResults } from "./integration";
-import { reactionInsights } from "./reaction-insights";
 
 /**
  * 강점과 살펴볼 점: 이미 계산된 점수와 정적 해석 문구만 모아 한 화면에 나란히 보여줍니다.
  * 새 점수를 만들지 않고, 같은 결과에서는 항상 같은 목록이 나옵니다.
  */
-export const BALANCE_VERSION = "balance-v1";
+export const BALANCE_VERSION = "balance-v2";
 export const BALANCE_LIMIT = 5;
 const HIGH = 63;
 const LOW = 37;
@@ -29,6 +27,9 @@ export interface BalanceSummary {
   care: readonly BalanceItem[];
 }
 
+const scaleName = (module: ModuleId, scale: string) => assessmentModules[module].scales.find((item) => item.id === scale)?.name
+  ?? { adaptive: "성숙한 방어", inhibitory: "신경증적 방어", immediate: "미성숙한 방어" }[scale] ?? scale;
+
 export function strengthsAndCare(results: ModuleResults): BalanceSummary {
   const strengths: BalanceItem[] = [];
   const care: BalanceItem[] = [];
@@ -36,21 +37,20 @@ export function strengthsAndCare(results: ModuleResults): BalanceSummary {
   for (const { rule, evidence } of integratedInsights(results).matched) {
     const item: BalanceItem = {
       id: `rule:${rule.id}`, source: "cross", title: rule.title, text: rule.text,
-      evidence: evidence.map((entry) => `${assessmentModules[entry.module].scales.find((scale) => scale.id === entry.scale)!.name} ${entry.score}`).join(" · "),
+      evidence: evidence.map((entry) => `${scaleName(entry.module, entry.scale)} ${entry.score}`).join(" · "),
     };
     (rule.kind === "resource" ? strengths : care).push(item);
   }
 
-  const reaction = results.reaction;
-  if (reaction?.module === "reaction") {
-    const insights = reactionInsights(reaction.result);
-    if (insights.recovery.level === "high") strengths.push({ id: "reaction:recovery", source: "reaction", title: "관점을 되찾는 힘", text: recoveryTexts.high, evidence: `관점 전환·회복 능력 ${insights.recovery.score}` });
-    if (insights.recovery.level === "low") care.push({ id: "reaction:recovery", source: "reaction", title: "관점을 되찾는 데 걸리는 시간", text: recoveryTexts.low, evidence: `관점 전환·회복 능력 ${insights.recovery.score}` });
-    const top = insights.features.find((item) => item.dimension !== "perspectiveRecovery" && item.score >= HIGH);
-    if (top) {
-      const meta = dimensions.find((dimension) => dimension.id === top.dimension)!;
-      care.push({ id: `reaction:${top.dimension}`, source: "reaction", title: `${meta.name} · 자주 드러나는 편`, text: `${meta.description}. 불편한 상황에서 이 반응이 먼저 올라올 수 있어요.`, evidence: `${meta.name} ${top.score}` });
-    }
+  const emotion = results.emotion;
+  if (emotion?.module === "emotion") {
+    const scales = emotion.profile.result.scales;
+    const ordered = [...scales].sort((a, b) => a.score - b.score || scales.indexOf(a) - scales.indexOf(b));
+    const easiest = ordered[0];
+    const hardest = ordered[ordered.length - 1];
+    const meta = (id: string) => emotionMeta.find((item) => item.id === id)!;
+    if (easiest.score <= 50) strengths.push({ id: `emotion:${easiest.scale}`, source: "emotion", title: meta(easiest.scale).shortName, text: meta(easiest.scale).strength, evidence: `${meta(easiest.scale).name} ${easiest.score}` });
+    if (hardest.score >= 50) care.push({ id: `emotion:${hardest.scale}`, source: "emotion", title: meta(hardest.scale).shortName, text: meta(hardest.scale).difficulty, evidence: `${meta(hardest.scale).name} ${hardest.score}` });
   }
 
   const defense = results.defense;

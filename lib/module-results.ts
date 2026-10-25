@@ -1,46 +1,50 @@
-import { attachmentMockResponses, defenseMockResponses, mockResponses, traitMockResponses } from "../data/mock-responses";
-import type { ModuleId } from "../data/modules";
-import { reactionInstrument } from "../data/questions";
-import type { LikertResponse, ResponseQuality } from "../types/assessment";
-import type { ScoringResult } from "../types/psychology";
+import type { AttachmentId } from "../data/attachment";
+import { dsq40Tiers } from "../data/defense-dsq";
+import type { EmotionId } from "../data/emotion";
+import { assessmentModules, type FormId, type ModuleId } from "../data/modules";
+import type { LikertInstrument, LikertResponse } from "../types/assessment";
+import type { DefenseId } from "../types/defense";
+import type { TraitId } from "../types/traits";
 import { analyzeAttachment, type AttachmentProfile } from "./attachment-analysis";
-import { analyzeDefenses, type DefenseProfile } from "./defense-analysis";
-import { responseQuality } from "./interpretation";
-import { scoreQuestionnaire } from "./scoring";
+import { analyzeDefenses, tiersFromLevels, type DefenseProfile } from "./defense-analysis";
+import { analyzeEmotion, type EmotionProfile } from "./emotion-analysis";
 import { analyzeTraits, type TraitProfile } from "./trait-analysis";
 
 export type ModuleResult =
-  | { module: "reaction"; result: ScoringResult; quality: ResponseQuality }
-  | { module: "defense"; profile: DefenseProfile }
-  | { module: "traits"; profile: TraitProfile }
-  | { module: "attachment"; profile: AttachmentProfile };
+  | { module: "emotion"; form: FormId; profile: EmotionProfile }
+  | { module: "defense"; form: FormId; profile: DefenseProfile }
+  | { module: "traits"; form: FormId; profile: TraitProfile }
+  | { module: "attachment"; form: FormId; profile: AttachmentProfile };
 
 export type ResultOf<M extends ModuleId> = Extract<ModuleResult, { module: M }>;
 
-/** 모듈별 결정론적 계산의 단일 진입점입니다. 완료되지 않은 응답은 ScoringError로 거부됩니다. */
-export function computeModuleResult(module: ModuleId, responses: readonly LikertResponse[]): ModuleResult {
+/** 모듈·검사지별 결정론적 계산의 단일 진입점입니다. 완료되지 않은 응답은 ScoringError로 거부됩니다. */
+export function computeModuleResult(module: ModuleId, form: FormId, responses: readonly LikertResponse[]): ModuleResult {
+  const instrument = assessmentModules[module].forms[form].instrument;
   switch (module) {
-    case "reaction": return { module, result: scoreQuestionnaire(responses), quality: responseQuality(responses, reactionInstrument) };
-    case "defense": return { module, profile: analyzeDefenses(responses) };
-    case "traits": return { module, profile: analyzeTraits(responses) };
-    case "attachment": return { module, profile: analyzeAttachment(responses) };
+    case "emotion": return { module, form, profile: analyzeEmotion(responses, instrument as LikertInstrument<EmotionId>) };
+    case "defense": {
+      const defenses = instrument as LikertInstrument<DefenseId>;
+      return { module, form, profile: analyzeDefenses(responses, defenses, form === "brief" ? dsq40Tiers : tiersFromLevels(defenses.scaleIds)) };
+    }
+    case "traits": return { module, form, profile: analyzeTraits(responses, instrument as LikertInstrument<TraitId>) };
+    case "attachment": return { module, form, profile: analyzeAttachment(responses, instrument as LikertInstrument<AttachmentId>) };
   }
 }
 
-const mockInputs: Record<ModuleId, readonly LikertResponse[]> = {
-  reaction: mockResponses,
-  defense: defenseMockResponses,
-  traits: traitMockResponses,
-  attachment: attachmentMockResponses,
-};
-
-/** 고정 mock 응답도 같은 계산 함수만 거칩니다. */
-export function computeExampleResult(module: ModuleId): ModuleResult {
-  return computeModuleResult(module, mockInputs[module]);
+/** 예시용 고정 응답: 문항 순서로 정해지는 의사난수(같은 입력 → 같은 응답). 실제 사용자 응답이 아닙니다. */
+export function exampleResponses(instrument: LikertInstrument): LikertResponse[] {
+  let seed = 7;
+  return instrument.items.map((item) => {
+    seed = (seed * 48271) % 2147483647;
+    const spread = Math.max(1, Math.round((instrument.points - 1) / 2));
+    const base = Math.round((instrument.points - 1) / 2);
+    const value = Math.min(instrument.points - 1, Math.max(0, base + (seed % (spread * 2 + 1)) - spread));
+    return { kind: "likert" as const, questionId: item.id, value };
+  });
 }
 
-/** 결과에 담긴 계산 근거(문항 ID·원응답)에서 응답 목록을 다시 만듭니다. */
-export function moduleResponses(result: ModuleResult): LikertResponse[] {
-  const scales = result.module === "reaction" ? result.result.dimensions : result.profile.result.scales;
-  return scales.flatMap((scale) => scale.evidence.map((item) => ({ kind: "likert" as const, questionId: item.questionId, value: item.rawValue })));
+/** 예시 결과도 같은 계산 함수만 거칩니다. 간편 검사 기준입니다. */
+export function computeExampleResult(module: ModuleId): ModuleResult {
+  return computeModuleResult(module, "brief", exampleResponses(assessmentModules[module].forms.brief.instrument));
 }

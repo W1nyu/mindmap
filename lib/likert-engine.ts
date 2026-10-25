@@ -1,7 +1,6 @@
-import type { InstrumentResult, LikertInstrument, LikertResponse, LikertValue } from "../types/assessment";
-import { isLikertValue } from "./questionnaire";
+import type { InstrumentResult, LikertInstrument, LikertResponse } from "../types/assessment";
 
-export const LIKERT_ENGINE_VERSION = "weighted-likert-v1";
+export const LIKERT_ENGINE_VERSION = "weighted-likert-v2";
 export type ScoringErrorCode = "INVALID_QUESTIONNAIRE" | "INVALID_RESPONSE" | "UNKNOWN_QUESTION" | "DUPLICATE_RESPONSE" | "MISSING_RESPONSE";
 
 export class ScoringError extends Error {
@@ -11,13 +10,21 @@ export class ScoringError extends Error {
   }
 }
 
+/** 0 ≤ value < points 인 정수인지 확인합니다. */
+export function isLikertValue(value: unknown, points: number): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0 && value < points;
+}
+
 /** 계산 전에 문항 데이터의 불일치를 거부합니다. 모든 척도에 최소 1문항이 있어야 합니다. */
 export function validateInstrument(instrument: LikertInstrument): void {
   if (!instrument || typeof instrument.id !== "string" || !instrument.id.trim() ||
     typeof instrument.version !== "string" || !instrument.version.trim() ||
+    !Number.isInteger(instrument.points) || instrument.points < 2 ||
+    !Array.isArray(instrument.options) || instrument.options.length !== instrument.points ||
+    instrument.options.some((option, index) => option.value !== index || !option.label) ||
     !Array.isArray(instrument.scaleIds) || instrument.scaleIds.length === 0 ||
     new Set(instrument.scaleIds).size !== instrument.scaleIds.length || !Array.isArray(instrument.items)) {
-    throw new Error("도구 ID, 버전, 척도 목록과 문항 목록이 필요합니다.");
+    throw new Error("도구 ID, 버전, 선택지, 척도 목록과 문항 목록이 필요합니다.");
   }
   const scales = new Set<string>(instrument.scaleIds);
   const ids = new Set<string>();
@@ -36,7 +43,10 @@ export function validateInstrument(instrument: LikertInstrument): void {
   }
 }
 
-/** 순수 함수: 역채점 → 척도별 가중 평균 → 0–100 정규화. 미응답은 0으로 대체하지 않습니다. */
+/**
+ * 순수 함수: 역채점(최댓값 − 응답) → 척도별 가중 평균 → 0–100 정규화.
+ * 원 척도 단위의 평균(1–points)도 함께 돌려줍니다. 미응답은 0으로 대체하지 않습니다.
+ */
 export function scoreLikertInstrument<S extends string>(
   instrument: LikertInstrument<S>,
   responses: readonly LikertResponse[],
@@ -50,11 +60,12 @@ export function scoreLikertInstrument<S extends string>(
   if (!Array.isArray(responses)) {
     throw new ScoringError("INVALID_RESPONSE", "응답 목록이 필요합니다.");
   }
+  const max = instrument.points - 1;
   const knownIds = new Set(instrument.items.map((item) => item.id));
-  const values = new Map<string, LikertValue>();
+  const values = new Map<string, number>();
   for (const response of responses) {
-    if (!response || response.kind !== "likert" || typeof response.questionId !== "string" || !isLikertValue(response.value)) {
-      throw new ScoringError("INVALID_RESPONSE", "응답은 0–4 사이의 정수여야 합니다.");
+    if (!response || response.kind !== "likert" || typeof response.questionId !== "string" || !isLikertValue(response.value, instrument.points)) {
+      throw new ScoringError("INVALID_RESPONSE", `응답은 0–${max} 사이의 정수여야 합니다.`);
     }
     if (!knownIds.has(response.questionId)) {
       throw new ScoringError("UNKNOWN_QUESTION", "알 수 없는 문항의 응답이 있습니다.");
@@ -70,7 +81,7 @@ export function scoreLikertInstrument<S extends string>(
   const scales = instrument.scaleIds.map((scale) => {
     const evidence = instrument.items.filter((item) => item.scale === scale).map((item) => {
       const rawValue = values.get(item.id)!;
-      const scoredValue = (item.reverse ? 4 - rawValue : rawValue) as LikertValue;
+      const scoredValue = item.reverse ? max - rawValue : rawValue;
       return { questionId: item.id, rawValue, scoredValue, reverse: item.reverse, weight: item.weight, weightedValue: scoredValue * item.weight };
     });
     const weightedSum = evidence.reduce((sum, item) => sum + item.weightedValue, 0);
@@ -78,10 +89,11 @@ export function scoreLikertInstrument<S extends string>(
     if (!Number.isFinite(weightedSum) || !Number.isFinite(weightSum)) {
       throw new ScoringError("INVALID_QUESTIONNAIRE", "가중치 합이 계산 범위를 벗어났습니다.");
     }
-    return { scale, score: Math.round((weightedSum / weightSum / 4) * 100), weightedSum, weightSum, evidence };
+    const average = weightedSum / weightSum;
+    return { scale, score: Math.round((average / max) * 100), mean: Math.round((average + 1) * 100) / 100, weightedSum, weightSum, evidence };
   });
   return {
     source: "computed", instrumentId: instrument.id, instrumentVersion: instrument.version,
-    scoringVersion, responseCount: responses.length, scales,
+    scoringVersion, points: instrument.points, responseCount: responses.length, scales,
   };
 }

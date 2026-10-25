@@ -5,9 +5,10 @@ SelfMap is a self-understanding tool, not a clinical diagnostic service.
 
 ## Psychology
 - Do not diagnose mental disorders.
-- Do not label users as fixed personality types.
+- Type cards are allowed only from published classification rules (see docs/instruments.md), always shown as current tendencies that can change, never as fixed types.
 - Describe tendencies probabilistically.
 - Scores must be produced by deterministic code.
+- Use published, validated instruments with their original item keys and response formats.
 - LLMs may explain scores but must not invent them.
 
 ## Engineering

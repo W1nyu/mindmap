@@ -1,69 +1,97 @@
-import type { LikertInstrument, LikertItem } from "../types/assessment";
-import type { TraitLeaning } from "../types/traits";
+import { agree7, buildInstrument } from "./instrument-kit";
 
 export const attachmentIds = ["attachmentAnxiety", "attachmentAvoidance"] as const;
 export type AttachmentId = (typeof attachmentIds)[number];
 
-export const ATTACHMENT_QUESTIONNAIRE_VERSION = "selfmap-attachment-12-v1";
-
 /**
- * 성인 애착의 두 차원(관계 불안·친밀 회피) 모델을 바탕으로 한 자체 작성 문항입니다.
- * Brennan, Clark & Shaver(1998)와 Fraley 외(2000) ECR-R의 구성 개념을 참고했지만 문항을 옮기지 않았습니다.
- * 애착 ‘유형’으로 분류하지 않고 두 연속 차원의 위치로만 보여줍니다.
+ * 성인 애착 두 차원. 간편 검사는 ECR-S 12문항(Wei 외, 2007), 심층 검사는 ECR-R 36문항(Fraley, Waller & Brennan, 2000).
+ * 두 척도 모두 7점 척도이며, 비상업적 연구 목적으로는 허가 없이 쓸 수 있도록 공개돼 있습니다.
+ * 문장은 SelfMap이 옮긴 한국어입니다. ‘연인’이 없다면 가까운 관계를 떠올려 답해도 됩니다(저자가 대상 수정을 허용).
  */
 export const attachmentMeta = [
   {
     id: "attachmentAnxiety", name: "관계 불안", shortName: "관계 불안",
     description: "가까운 사람이 떠나거나 마음이 식을까 봐 걱정하고 확인을 원하는 정도",
-    low: "관계를 비교적 믿고 편안하게 지내는 편이에요. 상대의 작은 변화에도 크게 흔들리지 않을 수 있어요.",
-    mixed: "상황이나 상대에 따라 관계를 믿는 마음과 걱정하는 마음이 오갈 수 있어요.",
-    high: "가까운 관계에 마음을 많이 쓰고, 상대의 마음을 확인하고 싶어질 때가 많을 수 있어요. 그만큼 관계를 소중히 여긴다는 뜻이기도 해요.",
+    low: "관계를 비교적 믿고 편안하게 지내는 편이에요.",
+    high: "관계를 소중히 여기는 만큼 상대의 마음을 확인하고 싶어질 때가 많을 수 있어요.",
   },
   {
     id: "attachmentAvoidance", name: "친밀 회피", shortName: "친밀 회피",
     description: "가까워지거나 의지하는 것이 불편해 거리와 독립을 지키려는 정도",
     low: "가까운 사람과 감정을 나누고 기대는 것이 비교적 자연스러운 편이에요.",
-    mixed: "어떤 관계에서는 쉽게 가까워지고, 어떤 관계에서는 거리를 두고 싶어질 수 있어요.",
-    high: "혼자 해결하고 나만의 공간을 지키는 것이 편한 편일 수 있어요. 독립성은 강점이지만, 힘들 때 기댈 기회를 놓칠 수 있어요.",
+    high: "혼자 해결하는 것이 편한 편이에요. 힘들 때 기댈 기회를 놓칠 수 있어요.",
   },
 ] as const;
 
-/** 두 차원이 모두 한쪽으로 기울었을 때만 쓰는 결합 설명. 유형 이름을 붙이지 않습니다. */
-export const attachmentCombos: Partial<Record<`${TraitLeaning}-${TraitLeaning}`, string>> = {
-  "low-low": "관계를 믿으면서도 가까워지는 것이 편한 쪽에 있어요. 갈등이 생겨도 관계 자체를 크게 의심하지 않고 다가가 이야기할 수 있는 바탕이 될 수 있어요.",
-  "high-low": "가까움을 원하고 그만큼 관계의 신호에 민감한 쪽에 있어요. 확인을 구하는 대신 내 필요를 직접 말해 보면 마음이 한결 편해질 수 있어요.",
-  "low-high": "관계를 크게 걱정하지는 않지만 거리를 두는 편이 편한 쪽에 있어요. 독립성이 강점이지만, 가까운 사람은 다가가기 어렵다고 느낄 수 있어요.",
-  "high-high": "가까워지고 싶으면서도 가까워지는 것이 두려운 마음이 함께 있는 쪽에 있어요. 다가가고 물러서기를 반복하며 지칠 수 있으니, 내 속도에 맞는 작은 연결부터 시작해 보세요.",
-};
-
-const itemSpecs: Record<AttachmentId, readonly (readonly [string, boolean])[]> = {
-  attachmentAnxiety: [
-    ["가까운 사람이 나를 정말 아끼는지 자주 확인하고 싶어진다.", false],
-    ["상대가 나만큼 이 관계를 원하지 않을까 봐 걱정될 때가 있다.", false],
-    ["관계가 안정적이라고 믿고 편안하게 지내는 편이다.", true],
-    ["상대의 마음이 나에게서 떠날까 봐 불안해질 때가 있다.", false],
-    ["가까운 사람에게 내가 충분하지 않다고 느껴질 때가 있다.", false],
-    ["가까운 사람의 애정이나 우정을 크게 의심하지 않는다.", true],
+/** ECR-S 12문항(원 순서). 관계 불안: 2, 4, 6, 8R, 10, 12 · 친밀 회피: 1R, 3, 5R, 7, 9R, 11 */
+export const ecrS = buildInstrument<AttachmentId>({
+  id: "ecr-s", version: "ecr-s-ko-selfmap-v1", options: agree7, scaleIds: attachmentIds,
+  items: [
+    ["힘들 때 연인에게 기대면 도움이 된다.", "attachmentAvoidance", true],
+    ["연인이 나를 사랑한다는 확인을 많이 받아야 한다.", "attachmentAnxiety"],
+    ["연인과 가까워지고 싶지만 자꾸 뒤로 물러서게 된다.", "attachmentAvoidance"],
+    ["연인이 내가 원하는 만큼 가까워지려 하지 않는다고 느낀다.", "attachmentAnxiety"],
+    ["위로와 안심을 비롯해 많은 것을 연인에게 의지한다.", "attachmentAvoidance", true],
+    ["아주 가까워지고 싶은 내 마음이 때로 사람들을 멀어지게 한다.", "attachmentAnxiety"],
+    ["연인과 너무 가까워지지 않으려고 한다.", "attachmentAvoidance"],
+    ["버림받을까 봐 걱정하는 일은 별로 없다.", "attachmentAnxiety", true],
+    ["대개 내 문제와 걱정을 연인과 의논한다.", "attachmentAvoidance", true],
+    ["필요할 때 연인이 곁에 없으면 답답하고 속상하다.", "attachmentAnxiety"],
+    ["연인이 너무 가까이 다가오면 긴장된다.", "attachmentAvoidance"],
+    ["연인이 내가 마음 쓰는 만큼 나에게 마음을 쓰지 않을까 봐 걱정한다.", "attachmentAnxiety"],
   ],
-  attachmentAvoidance: [
-    ["가까운 사람에게 속마음을 털어놓는 것이 불편하다.", false],
-    ["누군가 나에게 너무 가까이 다가오면 거리를 두고 싶어진다.", false],
-    ["가까운 사람과 감정을 나누는 것이 자연스럽다.", true],
-    ["다른 사람에게 의지하는 것이 어색하게 느껴진다.", false],
-    ["관계가 깊어질수록 나만의 공간이 줄어드는 것 같아 답답하다.", false],
-    ["필요할 때 가까운 사람에게 도움을 청하는 것이 편하다.", true],
-  ],
-};
+});
 
-/** 두 차원을 번갈아 배치합니다. */
-export const attachmentQuestions: readonly LikertItem<AttachmentId>[] = [0, 1, 2, 3, 4, 5].flatMap((round) => attachmentIds.map((scale) => ({
-  id: `attachment-${scale === "attachmentAnxiety" ? "anxiety" : "avoidance"}-${round + 1}`, kind: "likert" as const,
-  text: itemSpecs[scale][round][0], scale, reverse: itemSpecs[scale][round][1], weight: 1,
-})));
+/** ECR-R 36문항. 저자 웹페이지의 ECRR01–36 번호(1–18 관계 불안, 19–36 친밀 회피)를 따르고, 응답 순서만 두 차원을 번갈아 섞습니다. */
+const ecrRAnxiety: readonly (readonly [string, AttachmentId, boolean?])[] = [
+  ["연인의 사랑을 잃을까 봐 두렵다.", "attachmentAnxiety"],
+  ["연인이 나와 계속 함께하고 싶어 하지 않을까 봐 자주 걱정한다.", "attachmentAnxiety"],
+  ["연인이 나를 진심으로 사랑하지 않는 건 아닐까 자주 걱정한다.", "attachmentAnxiety"],
+  ["연인이 내가 마음 쓰는 만큼 나에게 마음을 쓰지 않을까 봐 걱정한다.", "attachmentAnxiety"],
+  ["연인의 마음이 내 마음만큼 강했으면 하고 자주 바란다.", "attachmentAnxiety"],
+  ["연인 관계에 대해 걱정을 많이 한다.", "attachmentAnxiety"],
+  ["연인이 눈앞에 없으면 다른 사람에게 관심을 가질까 봐 걱정된다.", "attachmentAnxiety"],
+  ["연인에게 내 감정을 보여 줄 때, 상대가 나와 같은 마음이 아닐까 봐 두렵다.", "attachmentAnxiety"],
+  ["연인이 나를 떠날까 봐 걱정하는 일은 거의 없다.", "attachmentAnxiety", true],
+  ["연인 때문에 나 자신을 의심하게 된다.", "attachmentAnxiety"],
+  ["버림받을까 봐 걱정하는 일은 별로 없다.", "attachmentAnxiety", true],
+  ["연인이 내가 원하는 만큼 가까워지려 하지 않는다고 느낀다.", "attachmentAnxiety"],
+  ["연인의 마음이 뚜렷한 이유 없이 나에게서 달라질 때가 있다.", "attachmentAnxiety"],
+  ["아주 가까워지고 싶은 내 마음이 때로 사람들을 멀어지게 한다.", "attachmentAnxiety"],
+  ["연인이 나를 제대로 알게 되면 진짜 내 모습을 좋아하지 않을까 봐 두렵다.", "attachmentAnxiety"],
+  ["연인에게서 필요한 애정과 지지를 받지 못하면 화가 난다.", "attachmentAnxiety"],
+  ["내가 다른 사람들만큼 괜찮지 못할까 봐 걱정한다.", "attachmentAnxiety"],
+  ["연인은 내가 화를 낼 때만 나에게 관심을 보이는 것 같다.", "attachmentAnxiety"],
+];
+const ecrRAvoidance: readonly (readonly [string, AttachmentId, boolean?])[] = [
+  ["마음 깊은 곳의 감정을 연인에게 보여 주지 않는 편이 좋다.", "attachmentAvoidance"],
+  ["연인과 개인적인 생각과 감정을 나누는 것이 편하다.", "attachmentAvoidance", true],
+  ["연인에게 의지하는 것이 어렵다.", "attachmentAvoidance"],
+  ["연인과 가까이 지내는 것이 매우 편하다.", "attachmentAvoidance", true],
+  ["연인에게 마음을 여는 것이 편하지 않다.", "attachmentAvoidance"],
+  ["연인과 너무 가까워지지 않는 편이 좋다.", "attachmentAvoidance"],
+  ["연인이 아주 가까워지길 원하면 불편해진다.", "attachmentAvoidance"],
+  ["연인과 가까워지는 것이 비교적 쉽다.", "attachmentAvoidance", true],
+  ["연인과 가까워지는 것이 어렵지 않다.", "attachmentAvoidance", true],
+  ["대개 내 문제와 걱정을 연인과 의논한다.", "attachmentAvoidance", true],
+  ["힘들 때 연인에게 기대면 도움이 된다.", "attachmentAvoidance", true],
+  ["연인에게 거의 모든 것을 이야기한다.", "attachmentAvoidance", true],
+  ["연인과 이런저런 일을 터놓고 이야기한다.", "attachmentAvoidance", true],
+  ["연인이 너무 가까이 다가오면 긴장된다.", "attachmentAvoidance"],
+  ["연인에게 의지하는 것이 편하다.", "attachmentAvoidance", true],
+  ["연인에게 기대는 것이 쉽다.", "attachmentAvoidance", true],
+  ["연인에게 애정을 표현하는 것이 쉽다.", "attachmentAvoidance", true],
+  ["연인은 나와 내 필요를 정말 잘 이해한다.", "attachmentAvoidance", true],
+];
 
-export const attachmentInstrument: LikertInstrument<AttachmentId> = {
-  id: "attachment",
-  version: ATTACHMENT_QUESTIONNAIRE_VERSION,
-  scaleIds: attachmentIds,
-  items: attachmentQuestions,
-};
+export const ecrR = buildInstrument<AttachmentId>({
+  id: "ecr-r", version: "ecr-r-ko-selfmap-v1", options: agree7, scaleIds: attachmentIds,
+  items: ecrRAnxiety.flatMap((item, index) => [item, ecrRAvoidance[index]]),
+});
+
+/**
+ * 네 가지 애착 유형(Bartholomew & Horowitz, 1991)으로 나눌 때의 기준점.
+ * Fraley가 공개한 ECR-R 온라인 표본(약 17,000명)의 평균(1–7)을 기준으로 위·아래를 나눕니다.
+ * 저자는 차원 점수를 그대로 보길 권하며, 유형은 이해를 돕는 참고 분류입니다.
+ */
+export const ATTACHMENT_NORMS = { anxiety: 3.56, avoidance: 2.92 } as const;
