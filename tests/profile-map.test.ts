@@ -37,6 +37,7 @@ test("every module becomes one group in a fixed order; rows are the computed sco
 test("modules without a result stay as empty groups", () => {
   const groups = profileGroups({ traits: computeExampleResult("traits") });
   assert.deepEqual(groups.map((group) => group.done), [false, false, true, false]);
+  assert.deepEqual(groups.map((group) => group.slots), [6, 3, 5, 2]);
   assert.deepEqual(profileLinks({ traits: computeExampleResult("traits") }, groups), []);
 });
 

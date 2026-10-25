@@ -35,8 +35,8 @@ const emotionTypes: Record<string, { name: string; summary: string }> = {
 };
 
 /**
- * 성격 세 원형(Robins 외, 1996; Asendorpf 외, 2001)을 개방성·성실성·외향성·친화성·신경증 순서의 방향으로 단순화한 기준 벡터.
- * 탄력형: 신경증 낮음, 나머지 높음 · 과잉통제형: 신경증 높음, 외향성 낮음 · 과소통제형: 성실성·친화성 낮음.
+ * 성격 세 원형(Robins 외, 1996; Asendorpf 외, 2001)을 개방성·성실성·외향성·친화성·부정적 정서성 순서의 방향으로 단순화한 기준 벡터.
+ * 탄력형: 부정적 정서성 낮음, 나머지 높음 · 과잉통제형: 부정적 정서성 높음, 외향성 낮음 · 과소통제형: 성실성·친화성 낮음.
  */
 export const traitPrototypes = [
   { id: "resilient", name: "탄력형", academic: "Resilient", vector: [0.5, 0.5, 0.5, 0.5, -1], summary: "정서가 비교적 안정되고 사람과 일에 두루 열려 있는 편이에요." },

@@ -2,7 +2,7 @@ import { attachmentMeta, ecrR, ecrS } from "./attachment";
 import { defenseMechanisms } from "./defense-mechanisms";
 import { dsq40, dsq60 } from "./defense-dsq";
 import { ders18, ders36, emotionMeta } from "./emotion";
-import { ipip50, miniIpip, traitMeta } from "./traits";
+import { bfi2, bfi2S, traitMeta } from "./traits";
 import type { LikertInstrument, ScaleMeta } from "../types/assessment";
 
 export const moduleIds = ["emotion", "defense", "traits", "attachment"] as const;
@@ -46,7 +46,7 @@ export const assessmentModules: Record<ModuleId, AssessmentModule> = {
     showScaleLabel: false,
     questionHint: "최근 몇 달 동안의 나를 떠올리며, 얼마나 자주 그런지 골라 주세요.",
     forms: {
-      brief: form("emotion", "brief", "DERS-18", ders18, 3, "Victor & Klonsky (2016)"),
+      brief: form("emotion", "brief", "DERS-18", ders18, 3, "Victor & Klonsky (2016) · 한국 단축형 검증 Kim et al. (2024)"),
       deep: form("emotion", "deep", "DERS-36", ders36, 6, "Gratz & Roemer (2004)"),
     },
   },
@@ -68,10 +68,10 @@ export const assessmentModules: Record<ModuleId, AssessmentModule> = {
     tagline: "나의 기본 성향을 다섯 개의 축으로",
     scales: traitMeta,
     showScaleLabel: false,
-    questionHint: "지금의 나를 있는 그대로 떠올리며, 나를 얼마나 잘 설명하는지 골라 주세요.",
+    questionHint: "‘나는 …한 사람이다’에 얼마나 동의하는지 골라 주세요.",
     forms: {
-      brief: form("traits", "brief", "Mini-IPIP", miniIpip, 3, "Donnellan et al. (2006)"),
-      deep: form("traits", "deep", "IPIP-50", ipip50, 7, "Goldberg (1992)"),
+      brief: form("traits", "brief", "BFI-2-S", bfi2S, 4, "Soto & John (2017) · 한국판 Choi et al. (2025)"),
+      deep: form("traits", "deep", "BFI-2", bfi2, 8, "Soto & John (2017) · 한국판 Choi et al. (2025)"),
     },
   },
   attachment: {

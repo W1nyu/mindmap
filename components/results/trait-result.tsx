@@ -16,7 +16,7 @@ function leaningText(leaning: TraitLeaning, low: string, high: string) {
 function TraitSpectrum({ profile }: { profile: TraitProfile }) {
   return <section className="viz-card" aria-labelledby="trait-spectrum-title">
     <div className="viz-heading"><div><h2 id="trait-spectrum-title">다섯 가지 스펙트럼 위의 나</h2></div><span className="subtle-label">가운데 음영: 양쪽을 오가는 범위</span></div>
-    <ul className="trait-list">{profile.leanings.map((item) => {
+    <ul className="trait-list module-traits">{profile.leanings.map((item) => {
       const trait = meta(item.trait);
       return <li key={item.trait}>
         <div className="trait-row-head"><h3>{trait.name}</h3><span className="trait-score">{item.mean.toFixed(1)}<small> / 5</small></span></div>
@@ -26,6 +26,9 @@ function TraitSpectrum({ profile }: { profile: TraitProfile }) {
         </div>
         <div className="trait-poles"><span>{trait.lowPole}</span><span>{trait.highPole}</span></div>
         <p className="trait-leaning">{leaningText(item.leaning, trait.lowPole, trait.highPole)}</p>
+        {profile.facets.length > 0 && <ul className="facet-list" aria-label={`${trait.name} 하위 측면`}>{profile.facets.filter((facet) => facet.domain === item.trait).map((facet) => <li key={facet.id}>
+          <span>{facet.name}</span><span className="facet-track" aria-hidden="true"><span style={{ width: `${Math.max(2, facet.score)}%` }} /></span><b>{facet.mean.toFixed(1)}</b>
+        </li>)}</ul>}
       </li>;
     })}</ul>
   </section>;

@@ -31,6 +31,8 @@ export interface ProfileGroup {
   direction: string;
   rows: readonly ProfileRow[];
   done: boolean;
+  /** 이 검사가 그리는 지표 수(검사 전에도 자리를 잡아 두는 데 씁니다) */
+  slots: number;
 }
 
 export interface ProfileLink {
@@ -50,13 +52,15 @@ const directions: Record<ModuleId, string> = {
   attachment: "높을수록 불안·회피 · 1–7",
 };
 
+const slotCount: Record<ModuleId, number> = { emotion: 6, defense: 3, traits: 5, attachment: 2 };
+
 const toScore = (mean: number, points: number) => Math.round(((mean - 1) / (points - 1)) * 100);
 
 export function profileGroups(results: ModuleResults): ProfileGroup[] {
   return moduleIds.map((module) => {
     const result = results[module];
     const meta = assessmentModules[module];
-    if (!result) return { module, title: meta.title, direction: directions[module], rows: [], done: false };
+    if (!result) return { module, title: meta.title, direction: directions[module], rows: [], done: false, slots: slotCount[module] };
     const points = result.profile.result.points;
     let rows: ProfileRow[];
     if (result.module === "defense") {
@@ -73,7 +77,7 @@ export function profileGroups(results: ModuleResults): ProfileGroup[] {
         reference: module === "attachment" ? toScore(scale.scale === "attachmentAnxiety" ? ATTACHMENT_NORMS.anxiety : ATTACHMENT_NORMS.avoidance, points) : undefined,
       }));
     }
-    return { module, title: meta.title, direction: directions[module], rows, done: true };
+    return { module, title: meta.title, direction: directions[module], rows, done: true, slots: rows.length };
   });
 }
 

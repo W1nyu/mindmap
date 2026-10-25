@@ -5,7 +5,7 @@ import { dsq40, dsq40Tiers, dsq60 } from "../data/defense-dsq";
 import { defenseMeta } from "../data/defense-mechanisms";
 import { ders18, ders36 } from "../data/emotion";
 import { assessmentModules, formIds, moduleIds } from "../data/modules";
-import { ipip50, miniIpip } from "../data/traits";
+import { bfi2, bfi2S, traitFacets } from "../data/traits";
 import { validateInstrument } from "../lib/likert-engine";
 import type { LikertInstrument } from "../types/assessment";
 
@@ -15,7 +15,7 @@ const itemAt = (instrument: LikertInstrument, number: number) => instrument.item
 const reversed = (instrument: LikertInstrument) => instrument.items.flatMap((item, index) => (item.reverse ? [index + 1] : []));
 
 test("every module has a valid brief and deep form with the original response format", () => {
-  const expected = { emotion: [18, 36, 5], defense: [40, 60, 9], traits: [20, 50, 5], attachment: [12, 36, 7] } as const;
+  const expected = { emotion: [18, 36, 5], defense: [40, 60, 9], traits: [30, 60, 5], attachment: [12, 36, 7] } as const;
   for (const id of moduleIds) {
     for (const form of formIds) validateInstrument(assessmentModules[id].forms[form].instrument);
     const [brief, deep, points] = expected[id];
@@ -54,11 +54,21 @@ test("DSQ-40 and DSQ-60 score every defense from exactly two items with no rever
   for (const id of [...dsq40.scaleIds, ...dsq60.scaleIds]) assert.ok(defenseMeta(id), id);
 });
 
-test("IPIP forms keep the original keying (neuroticism scored from reversed emotional stability)", () => {
-  assert.deepEqual(Object.fromEntries(miniIpip.scaleIds.map((id) => [id, count(miniIpip, id, true)])), { openness: 3, conscientiousness: 2, extraversion: 2, agreeableness: 2, neuroticism: 2 });
-  for (const id of ipip50.scaleIds) assert.equal(count(ipip50, id), 10, id);
-  assert.deepEqual(Object.fromEntries(ipip50.scaleIds.map((id) => [id, count(ipip50, id, true)])), { openness: 3, conscientiousness: 4, extraversion: 5, agreeableness: 4, neuroticism: 2 });
-  assert.deepEqual([9, 19].map((n) => [itemAt(ipip50, n).scale, itemAt(ipip50, n).reverse]), [["neuroticism", true], ["neuroticism", true]]);
+test("BFI-2 and BFI-2-S follow the published domain and facet keys", () => {
+  for (const id of bfi2S.scaleIds) {
+    assert.equal(count(bfi2S, id), 6, id);
+    assert.equal(count(bfi2S, id, true), 3, id);
+  }
+  for (const id of bfi2.scaleIds) {
+    assert.equal(count(bfi2, id), 12, id);
+    assert.equal(count(bfi2, id, true), 6, id);
+  }
+  assert.deepEqual(reversed(bfi2S), [1, 3, 7, 8, 10, 14, 17, 19, 20, 21, 24, 26, 27, 28, 30]);
+  assert.deepEqual(reversed(bfi2).filter((n) => itemAt(bfi2, n).scale === "neuroticism"), [4, 9, 24, 29, 44, 49]);
+  assert.equal(traitFacets.length, 15);
+  const covered = traitFacets.flatMap((facet) => facet.items);
+  assert.deepEqual([...covered].sort((a, b) => a - b), Array.from({ length: 60 }, (_, index) => index + 1));
+  for (const facet of traitFacets) for (const n of facet.items) assert.equal(itemAt(bfi2, n).scale, facet.domain, facet.id);
 });
 
 test("ECR-S and ECR-R follow the published reverse keys", () => {

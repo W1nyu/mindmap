@@ -92,6 +92,6 @@ export function DmrsHierarchy({ profile }: { profile: DefenseProfile }) {
     <details className="dmrs-details"><summary>각 단계는 어떤 방식인가요?</summary>
       <dl>{dmrsLevels.filter((meta) => dmrs.levels.find((level) => level.level === meta.level)?.measured).map((meta) => <div key={meta.level}><dt>{meta.level}단계 · {meta.name}</dt><dd>{meta.description}</dd></div>)}</dl>
     </details>
-    <p className="viz-caption">자기보고 점수로 만든 참고 지표예요. 누구나 상황에 따라 여러 단계를 오가요.</p>
+    <p className="viz-caption">가중 평균 수준은 DMRS의 전반 방어 기능(ODF) 계산 방식을 따른 참고 지표예요(자기보고판 DMRS-SR-30, Di Giuseppe 외, 2020). 누구나 상황에 따라 여러 단계를 오가요.</p>
   </section>;
 }

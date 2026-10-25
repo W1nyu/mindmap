@@ -3,8 +3,8 @@ import type { LikertInstrument, LikertOption } from "../types/assessment";
 /** 원 척도의 선택지를 그대로 따릅니다. 이름은 SelfMap이 옮긴 한국어입니다. */
 const options = (labels: readonly string[]): LikertOption[] => labels.map((label, value) => ({ value, label }));
 
-/** IPIP: Very Inaccurate – Very Accurate (5점) */
-export const accuracy5 = options(["전혀 아니다", "아닌 편이다", "보통이다", "그런 편이다", "매우 그렇다"]);
+/** BFI-2: Disagree strongly – Agree strongly (5점) */
+export const agree5 = options(["전혀 아니다", "약간 아니다", "보통이다", "약간 그렇다", "매우 그렇다"]);
 /** DERS: almost never (0–10%) – almost always (91–100%) (5점) */
 export const frequency5 = options(["거의 없다 (0–10%)", "가끔 (11–35%)", "절반 정도 (36–65%)", "대부분 (66–90%)", "거의 항상 (91–100%)"]);
 /** ECR-R·ECR-S: Strongly disagree – Strongly agree (7점) */
