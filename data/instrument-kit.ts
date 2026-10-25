@@ -7,7 +7,7 @@ const options = (labels: readonly string[]): LikertOption[] => labels.map((label
 export const agree5 = options(["전혀 아니다", "약간 아니다", "보통이다", "약간 그렇다", "매우 그렇다"]);
 /** DERS: almost never (0–10%) – almost always (91–100%) (5점) */
 export const frequency5 = options(["거의 없다 (0–10%)", "가끔 (11–35%)", "절반 정도 (36–65%)", "대부분 (66–90%)", "거의 항상 (91–100%)"]);
-/** ECR-R·ECR-S: Strongly disagree – Strongly agree (7점) */
+/** ECR-R·ECR-RS: Strongly disagree – Strongly agree (7점) */
 export const agree7 = options(["전혀 아니다", "아니다", "약간 아니다", "보통이다", "약간 그렇다", "그렇다", "매우 그렇다"]);
 /** DSQ: 1 strongly disagree · 5 neither · 9 strongly agree (9점) */
 export const agree9 = options(["전혀 동의 안 함", "동의 안 함", "대체로 동의 안 함", "약간 동의 안 함", "중간", "약간 동의", "대체로 동의", "동의", "매우 동의"]);

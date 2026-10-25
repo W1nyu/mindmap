@@ -12,7 +12,7 @@ import { createInstrumentSession, instrumentResponses } from "@/lib/session";
 
 export function Questionnaire({ moduleId, form }: { moduleId: ModuleId; form: FormId }) {
   const assessment = assessmentModules[moduleId];
-  const { instrument } = assessment.forms[form];
+  const { instrument, hint } = assessment.forms[form];
   const store = moduleStores[moduleId][form];
   const items = instrument.items;
   const router = useRouter();
@@ -109,7 +109,7 @@ export function Questionnaire({ moduleId, form }: { moduleId: ModuleId; form: Fo
       </> : <>
         {items.length >= 30 && answeredCount >= Math.floor(items.length / 2) && answeredCount < Math.floor(items.length / 2) + 3 && <p className="halfway-note" role="status"><Icon name="leaf" size={15} /> 절반을 지났어요. 응답은 저장돼 있으니 쉬었다 이어가도 괜찮아요.</p>}
         <h2 ref={headingRef} tabIndex={-1} id="question-label">{question.text}</h2>
-        <p className="question-hint" id="question-hint">{assessment.questionHint}</p>
+        <p className="question-hint" id="question-hint">{hint ?? assessment.questionHint}</p>
         <div aria-labelledby="question-label"><LikertInput key={question.id} questionId={question.id} options={instrument.options} value={selected} onChange={answer} /></div>
         <div className="question-bottom"><button type="button" className="text-link" disabled={session.currentQuestionIndex === 0} onClick={() => goTo(session.currentQuestionIndex - 1)}>이전</button><button type="button" className="button button-primary" disabled={selected === undefined} onClick={next}>{isLast ? "응답 확인" : "다음"} <Icon name="arrow" size={17} /></button></div>
         <p className="question-feedback" aria-live="polite"><span className="kbd-hint">키보드 <kbd>1</kbd>–<kbd>{instrument.points}</kbd>로 고르고 <kbd>Enter</kbd>로 넘어가요.</span></p>

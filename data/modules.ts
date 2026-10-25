@@ -1,4 +1,4 @@
-import { attachmentMeta, ecrR, ecrS } from "./attachment";
+import { attachmentMeta, ecrR, ecrRS } from "./attachment";
 import { defenseMechanisms } from "./defense-mechanisms";
 import { dsq40, dsq60 } from "./defense-dsq";
 import { ders18, ders36, emotionMeta } from "./emotion";
@@ -21,6 +21,8 @@ export interface ModuleForm {
   estimatedMinutes: number;
   storageKey: string;
   citation: string;
+  /** 검사지마다 다른 안내가 필요할 때 모듈 안내 대신 씁니다. */
+  hint?: string;
 }
 
 export interface AssessmentModule {
@@ -34,8 +36,8 @@ export interface AssessmentModule {
   forms: Record<FormId, ModuleForm>;
 }
 
-const form = (module: ModuleId, id: FormId, name: string, instrument: LikertInstrument, estimatedMinutes: number, citation: string): ModuleForm =>
-  ({ id, name, instrument, estimatedMinutes, citation, storageKey: `selfmap.v3.${module}.${id}` });
+const form = (module: ModuleId, id: FormId, name: string, instrument: LikertInstrument, estimatedMinutes: number, citation: string, hint?: string): ModuleForm =>
+  ({ id, name, instrument, estimatedMinutes, citation, hint, storageKey: `selfmap.v3.${module}.${id}` });
 
 export const assessmentModules: Record<ModuleId, AssessmentModule> = {
   emotion: {
@@ -82,8 +84,8 @@ export const assessmentModules: Record<ModuleId, AssessmentModule> = {
     showScaleLabel: false,
     questionHint: "연인 관계를 떠올려 주세요. 지금 연인이 없다면 가까운 사람과의 관계를 떠올려도 괜찮아요.",
     forms: {
-      brief: form("attachment", "brief", "ECR-S", ecrS, 3, "Wei et al. (2007)"),
-      deep: form("attachment", "deep", "ECR-R", ecrR, 7, "Fraley, Waller & Brennan (2000)"),
+      brief: form("attachment", "brief", "ECR-RS", ecrRS, 2, "Fraley et al. (2011)", "가까운 사람들과의 관계 전반을 떠올려 주세요(특정 한 사람이 아니라 일반적으로)."),
+      deep: form("attachment", "deep", "ECR-R", ecrR, 7, "Fraley, Waller & Brennan (2000)", "연인 관계를 떠올려 주세요. 지금 연인이 없다면 가장 최근의 의미 있는 관계를 떠올려도 괜찮아요."),
     },
   },
 };

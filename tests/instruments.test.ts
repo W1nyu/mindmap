@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { ecrR, ecrS } from "../data/attachment";
+import { ecrR, ecrRS } from "../data/attachment";
 import { dsq40, dsq40Tiers, dsq60 } from "../data/defense-dsq";
 import { defenseMeta } from "../data/defense-mechanisms";
 import { ders18, ders36 } from "../data/emotion";
@@ -15,7 +15,7 @@ const itemAt = (instrument: LikertInstrument, number: number) => instrument.item
 const reversed = (instrument: LikertInstrument) => instrument.items.flatMap((item, index) => (item.reverse ? [index + 1] : []));
 
 test("every module has a valid brief and deep form with the original response format", () => {
-  const expected = { emotion: [18, 36, 5], defense: [40, 60, 9], traits: [30, 60, 5], attachment: [12, 36, 7] } as const;
+  const expected = { emotion: [18, 36, 5], defense: [40, 60, 9], traits: [30, 60, 5], attachment: [9, 36, 7] } as const;
   for (const id of moduleIds) {
     for (const form of formIds) validateInstrument(assessmentModules[id].forms[form].instrument);
     const [brief, deep, points] = expected[id];
@@ -71,9 +71,9 @@ test("BFI-2 and BFI-2-S follow the published domain and facet keys", () => {
   for (const facet of traitFacets) for (const n of facet.items) assert.equal(itemAt(bfi2, n).scale, facet.domain, facet.id);
 });
 
-test("ECR-S and ECR-R follow the published reverse keys", () => {
-  assert.equal(count(ecrS, "attachmentAnxiety", true), 1);
-  assert.equal(count(ecrS, "attachmentAvoidance", true), 3);
+test("ECR-RS and ECR-R follow the published reverse keys", () => {
+  assert.deepEqual([count(ecrRS, "attachmentAvoidance"), count(ecrRS, "attachmentAnxiety")], [6, 3]);
+  assert.deepEqual(reversed(ecrRS), [1, 2, 3, 4]);
   assert.equal(count(ecrR, "attachmentAnxiety"), 18);
   assert.equal(count(ecrR, "attachmentAnxiety", true), 2);
   assert.equal(count(ecrR, "attachmentAvoidance", true), 12);

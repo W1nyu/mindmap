@@ -40,7 +40,7 @@ npm.cmd run smoke -- http://localhost:3000
 | 정서조절 | DERS-18 | DERS-36 | 5점 |
 | 방어기제 | DSQ-40 | DSQ-60 | 9점 |
 | 성격 5요인 | BFI-2-S | BFI-2 (15개 하위 측면) | 5점 |
-| 성인 애착 | ECR-S | ECR-R | 7점 |
+| 성인 애착 | ECR-RS 일반형 | ECR-R | 7점 |
 | 상태 체크 | WHO-5 | — | 6점 |
 
 ## 채점

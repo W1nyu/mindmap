@@ -4,7 +4,7 @@ export const attachmentIds = ["attachmentAnxiety", "attachmentAvoidance"] as con
 export type AttachmentId = (typeof attachmentIds)[number];
 
 /**
- * 성인 애착 두 차원(애착불안·애착회피, 한국판 ECR-R 김성현의 표기). 간편 검사는 ECR-S 12문항(Wei 외, 2007), 심층 검사는 ECR-R 36문항(Fraley, Waller & Brennan, 2000).
+ * 성인 애착 두 차원(애착불안·애착회피, 한국판 ECR-R 김성현의 표기). 간편 검사는 ECR-RS 일반형 9문항(Fraley 외, 2011), 심층 검사는 ECR-R 36문항(Fraley, Waller & Brennan, 2000).
  * 두 척도 모두 7점 척도이며, 비상업적 연구 목적으로는 허가 없이 쓸 수 있도록 공개돼 있습니다.
  * 문장은 SelfMap이 옮긴 한국어입니다. ‘연인’이 없다면 가까운 관계를 떠올려 답해도 됩니다(저자가 대상 수정을 허용).
  */
@@ -23,22 +23,23 @@ export const attachmentMeta = [
   },
 ] as const;
 
-/** ECR-S 12문항(원 순서). 애착불안: 2, 4, 6, 8R, 10, 12 · 애착회피: 1R, 3, 5R, 7, 9R, 11 */
-export const ecrS = buildInstrument<AttachmentId>({
-  id: "ecr-s", version: "ecr-s-ko-selfmap-v1", options: agree7, scaleIds: attachmentIds,
+/**
+ * ECR-RS 일반형 9문항(Fraley, Heffernan, Vicary & Brumbaugh, 2011; 2014년 일반 관계용 지시문).
+ * 저자 연구실이 ECR-R의 9문항판으로 쓸 수 있다고 안내하며, 연인에 한정하지 않고 가까운 관계 전반을 묻습니다.
+ * 애착회피: 1R, 2R, 3R, 4R, 5, 6 · 애착불안: 7, 8, 9. 응답은 2011년 원 논문의 7점 척도를 씁니다.
+ */
+export const ecrRS = buildInstrument<AttachmentId>({
+  id: "ecr-rs", version: "ecr-rs-general-ko-selfmap-v1", options: agree7, scaleIds: attachmentIds,
   items: [
-    ["힘들 때 연인에게 기대면 도움이 된다.", "attachmentAvoidance", true],
-    ["연인이 나를 사랑한다는 확인을 많이 받아야 한다.", "attachmentAnxiety"],
-    ["연인과 가까워지고 싶지만 자꾸 뒤로 물러서게 된다.", "attachmentAvoidance"],
-    ["연인이 내가 원하는 만큼 가까워지려 하지 않는다고 느낀다.", "attachmentAnxiety"],
-    ["위로와 안심을 비롯해 많은 것을 연인에게 의지한다.", "attachmentAvoidance", true],
-    ["아주 가까워지고 싶은 내 마음이 때로 사람들을 멀어지게 한다.", "attachmentAnxiety"],
-    ["연인과 너무 가까워지지 않으려고 한다.", "attachmentAvoidance"],
-    ["버림받을까 봐 걱정하는 일은 별로 없다.", "attachmentAnxiety", true],
-    ["대개 내 문제와 걱정을 연인과 의논한다.", "attachmentAvoidance", true],
-    ["필요할 때 연인이 곁에 없으면 답답하고 속상하다.", "attachmentAnxiety"],
-    ["연인이 너무 가까이 다가오면 긴장된다.", "attachmentAvoidance"],
-    ["연인이 내가 마음 쓰는 만큼 나에게 마음을 쓰지 않을까 봐 걱정한다.", "attachmentAnxiety"],
+    ["힘들 때 다른 사람에게 기대면 도움이 된다.", "attachmentAvoidance", true],
+    ["대개 내 문제와 걱정을 다른 사람과 의논한다.", "attachmentAvoidance", true],
+    ["다른 사람과 이런저런 일을 터놓고 이야기한다.", "attachmentAvoidance", true],
+    ["다른 사람에게 의지하는 것이 쉽다.", "attachmentAvoidance", true],
+    ["다른 사람에게 마음을 여는 것이 편하지 않다.", "attachmentAvoidance"],
+    ["마음 깊은 곳의 감정을 다른 사람에게 보여 주지 않는 편이 좋다.", "attachmentAvoidance"],
+    ["다른 사람들이 나를 정말로 아끼지 않는 것 같아 자주 걱정한다.", "attachmentAnxiety"],
+    ["다른 사람들이 나를 떠나 버릴까 봐 두렵다.", "attachmentAnxiety"],
+    ["다른 사람들이 내가 마음 쓰는 만큼 나에게 마음을 쓰지 않을까 봐 걱정한다.", "attachmentAnxiety"],
   ],
 });
 
