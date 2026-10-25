@@ -25,9 +25,9 @@ export interface ScalePrecision {
 }
 
 export const agreementLabels: Record<Agreement, string> = {
-  consistent: "문항끼리 일치",
-  moderate: "대체로 일치",
-  mixed: "문항마다 엇갈림",
+  consistent: "일관성 높음",
+  moderate: "일관성 보통",
+  mixed: "일관성 낮음",
 };
 
 const round2 = (value: number) => Math.round(value * 100) / 100;

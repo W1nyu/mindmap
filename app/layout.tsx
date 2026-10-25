@@ -11,7 +11,7 @@ const body = IBM_Plex_Sans_KR({ weight: ["400", "500", "600", "700"], subsets: [
 
 export const metadata: Metadata = {
   title: { default: "SelfMap · 나를 이해하는 심리 지도", template: "%s · SelfMap" },
-  description: "반응 패턴, 방어기제, 성격, 관계 애착을 등고선 지도로 보여주는 자기이해 도구. 진단이 아닙니다.",
+  description: "정서조절, 방어기제, 성격 5요인, 성인 애착을 공인 심리 척도로 측정해 보여주는 자기이해 도구. 진단이 아닙니다.",
 };
 
 export const viewport: Viewport = {

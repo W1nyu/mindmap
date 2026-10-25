@@ -4,26 +4,26 @@ export const attachmentIds = ["attachmentAnxiety", "attachmentAvoidance"] as con
 export type AttachmentId = (typeof attachmentIds)[number];
 
 /**
- * 성인 애착 두 차원. 간편 검사는 ECR-S 12문항(Wei 외, 2007), 심층 검사는 ECR-R 36문항(Fraley, Waller & Brennan, 2000).
+ * 성인 애착 두 차원(애착불안·애착회피, 한국판 ECR-R 김성현의 표기). 간편 검사는 ECR-S 12문항(Wei 외, 2007), 심층 검사는 ECR-R 36문항(Fraley, Waller & Brennan, 2000).
  * 두 척도 모두 7점 척도이며, 비상업적 연구 목적으로는 허가 없이 쓸 수 있도록 공개돼 있습니다.
  * 문장은 SelfMap이 옮긴 한국어입니다. ‘연인’이 없다면 가까운 관계를 떠올려 답해도 됩니다(저자가 대상 수정을 허용).
  */
 export const attachmentMeta = [
   {
-    id: "attachmentAnxiety", name: "관계 불안", shortName: "관계 불안",
+    id: "attachmentAnxiety", name: "애착불안", shortName: "애착불안",
     description: "가까운 사람이 떠나거나 마음이 식을까 봐 걱정하고 확인을 원하는 정도",
     low: "관계를 비교적 믿고 편안하게 지내는 편이에요.",
     high: "관계를 소중히 여기는 만큼 상대의 마음을 확인하고 싶어질 때가 많을 수 있어요.",
   },
   {
-    id: "attachmentAvoidance", name: "친밀 회피", shortName: "친밀 회피",
+    id: "attachmentAvoidance", name: "애착회피", shortName: "애착회피",
     description: "가까워지거나 의지하는 것이 불편해 거리와 독립을 지키려는 정도",
     low: "가까운 사람과 감정을 나누고 기대는 것이 비교적 자연스러운 편이에요.",
     high: "혼자 해결하는 것이 편한 편이에요. 힘들 때 기댈 기회를 놓칠 수 있어요.",
   },
 ] as const;
 
-/** ECR-S 12문항(원 순서). 관계 불안: 2, 4, 6, 8R, 10, 12 · 친밀 회피: 1R, 3, 5R, 7, 9R, 11 */
+/** ECR-S 12문항(원 순서). 애착불안: 2, 4, 6, 8R, 10, 12 · 애착회피: 1R, 3, 5R, 7, 9R, 11 */
 export const ecrS = buildInstrument<AttachmentId>({
   id: "ecr-s", version: "ecr-s-ko-selfmap-v1", options: agree7, scaleIds: attachmentIds,
   items: [
@@ -42,7 +42,7 @@ export const ecrS = buildInstrument<AttachmentId>({
   ],
 });
 
-/** ECR-R 36문항. 저자 웹페이지의 ECRR01–36 번호(1–18 관계 불안, 19–36 친밀 회피)를 따르고, 응답 순서만 두 차원을 번갈아 섞습니다. */
+/** ECR-R 36문항. 저자 웹페이지의 ECRR01–36 번호(1–18 애착불안, 19–36 애착회피)를 따르고, 응답 순서만 두 차원을 번갈아 섞습니다. */
 const ecrRAnxiety: readonly (readonly [string, AttachmentId, boolean?])[] = [
   ["연인의 사랑을 잃을까 봐 두렵다.", "attachmentAnxiety"],
   ["연인이 나와 계속 함께하고 싶어 하지 않을까 봐 자주 걱정한다.", "attachmentAnxiety"],

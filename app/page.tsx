@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DemoTerrain } from "@/components/home/demo-terrain";
+import { DemoProfile } from "@/components/home/demo-profile";
 import { HomeSwitch } from "@/components/home/home-dashboard";
 import { Icon } from "@/components/icon";
 import { assessmentModules, moduleIds } from "@/data/modules";
@@ -9,10 +9,10 @@ function Landing() {
     <section className="hero-grid" aria-labelledby="hero-title">
       <div className="hero-copy">
         <h1 id="hero-title">나는 왜 그 순간, 그렇게 반응했을까?</h1>
-        <p className="hero-description">연구와 상담 현장에서 쓰는 네 가지 심리 척도로 마음의 지형을 그리고, 나의 유형을 카드로 보여줘요.</p>
+        <p className="hero-description">연구와 상담 현장에서 쓰는 네 가지 심리 척도로 나를 측정하고, 지표 사이의 연결과 나의 유형을 보여줘요.</p>
         <div className="hero-actions"><Link className="button button-primary" href="/questions">시작하기 <Icon name="arrow" size={18} /></Link><Link href="/results?example=1" className="text-link">예시 보기</Link></div>
       </div>
-      <div className="map-preview-card"><DemoTerrain /></div>
+      <div className="map-preview-card"><DemoProfile /></div>
     </section>
     <section className="dimensions-section" aria-label="검사">
       <div className="home-module-grid">{moduleIds.map((id) => {

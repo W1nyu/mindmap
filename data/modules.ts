@@ -40,8 +40,8 @@ const form = (module: ModuleId, id: FormId, name: string, instrument: LikertInst
 export const assessmentModules: Record<ModuleId, AssessmentModule> = {
   emotion: {
     id: "emotion",
-    title: "감정 조절",
-    tagline: "속상한 순간, 감정을 어떻게 다루는지",
+    title: "정서조절",
+    tagline: "속상한 순간 정서를 다루는 방식(정서조절곤란)",
     scales: emotionMeta,
     showScaleLabel: false,
     questionHint: "최근 몇 달 동안의 나를 떠올리며, 얼마나 자주 그런지 골라 주세요.",
@@ -76,7 +76,7 @@ export const assessmentModules: Record<ModuleId, AssessmentModule> = {
   },
   attachment: {
     id: "attachment",
-    title: "관계 애착",
+    title: "성인 애착",
     tagline: "가까운 관계에서 다가가고 물러서는 방식",
     scales: attachmentMeta,
     showScaleLabel: false,

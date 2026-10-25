@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ResultsOverview } from "@/components/results/results-overview";
 
-export const metadata: Metadata = { title: "나의 마음 지형도" };
+export const metadata: Metadata = { title: "나의 마음 프로필" };
 
 export default async function ResultsPage({ searchParams }: {
   searchParams: Promise<{ example?: string | string[] }>;

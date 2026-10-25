@@ -5,7 +5,7 @@ import { traitIds, type TraitId, type TraitMeta } from "../types/traits";
  * 성격 5요인: IPIP(International Personality Item Pool, 공개 도메인) 문항.
  * 간편 검사는 Mini-IPIP 20문항(Donnellan 외, 2006), 심층 검사는 IPIP Big-Five 요인 지표 50문항(Goldberg, 1992).
  * 두 판 모두 원 문항 순서와 채점 방향을 따릅니다. 50문항판의 네 번째 요인은 원래 ‘정서 안정성’이라
- * 신경성으로 쓰기 위해 채점 방향을 반대로 바꿨습니다(Mini-IPIP와 같은 방식). 문장은 SelfMap이 옮긴 한국어입니다.
+ * 신경증으로 쓰기 위해 채점 방향을 반대로 바꿨습니다(Mini-IPIP와 같은 방식). 문장은 SelfMap이 옮긴 한국어입니다.
  */
 export const traitMeta = [
   {
@@ -36,7 +36,7 @@ export const traitMeta = [
     highChallenge: "자극이 적은 환경에서 답답함을 느끼거나 충분히 쉬지 못할 수 있어요.",
   },
   {
-    id: "agreeableness", name: "우호성", shortName: "우호성",
+    id: "agreeableness", name: "친화성", shortName: "친화성",
     description: "다른 사람의 감정과 필요에 마음을 쓰는 정도",
     lowPole: "독립적이고 분석적인", highPole: "공감적이고 협력적인",
     lowStrength: "객관적인 판단, 필요한 때 분명하게 이견을 말하는 힘",
@@ -45,7 +45,7 @@ export const traitMeta = [
     highChallenge: "다른 사람을 챙기느라 내 필요를 뒤로 미룰 수 있어요.",
   },
   {
-    id: "neuroticism", name: "신경성(정서적 민감성)", shortName: "신경성",
+    id: "neuroticism", name: "신경증", shortName: "신경증",
     description: "불안, 속상함 같은 감정을 얼마나 자주·강하게 느끼는지",
     lowPole: "감정 변화가 잔잔한", highPole: "감정을 섬세하게 느끼는",
     lowStrength: "압박 속에서도 차분함을 유지하는 안정감",
@@ -83,7 +83,7 @@ export const miniIpip = buildInstrument<TraitId>({
   ],
 });
 
-/** IPIP 50문항 Big-Five 요인 지표(원 순서). 원 키: (1)외향성 (2)우호성 (3)성실성 (4)정서 안정성 (5)지성·상상력. */
+/** IPIP 50문항 Big-Five 요인 지표(원 순서). 원 키: (1)외향성 (2)친화성 (3)성실성 (4)정서 안정성 (5)지성·상상력. */
 export const ipip50 = buildInstrument<TraitId>({
   id: "ipip50", version: "ipip50-ko-selfmap-v1", options: accuracy5,
   scaleIds: traitIds,

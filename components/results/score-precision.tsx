@@ -26,10 +26,10 @@ export function ScorePrecision({ id, result }: { id: ModuleId; result: ModuleRes
   const shapeText = shape.scatter < 10 ? "척도끼리 점수 차이가 작은 고른 프로필이에요" : shape.scatter >= 20 ? "높고 낮은 척도가 뚜렷하게 갈리는 프로필이에요" : "몇몇 척도가 두드러지는 프로필이에요";
 
   return <section className="viz-card" aria-labelledby="precision-title">
-    <div className="viz-heading"><div><h2 id="precision-title">점수의 확실도</h2><p className="viz-caption" style={{ marginTop: 2 }}>점은 문항 응답, 띠는 ±1 표준오차예요. 띠가 넓을수록 답이 엇갈렸어요.</p></div></div>
+    <div className="viz-heading"><div><h2 id="precision-title">문항 응답 일관성</h2><p className="viz-caption" style={{ marginTop: 2 }}>점은 문항 응답, 띠는 ±1 표준오차예요. 띠가 넓을수록 답이 엇갈렸어요.</p></div></div>
     <dl className="precision-summary">
-      <div><dt>프로필 높이</dt><dd>{shape.elevation}</dd><small>척도 점수 평균</small></div>
-      <div><dt>프로필 퍼짐</dt><dd>{shape.scatter}</dd><small>척도 점수 표준편차</small></div>
+      <div><dt>프로파일 수준</dt><dd>{shape.elevation}</dd><small>척도 점수 평균</small></div>
+      <div><dt>프로파일 분산</dt><dd>{shape.scatter}</dd><small>척도 점수 표준편차</small></div>
       <p>{shapeText}.</p>
     </dl>
     <ul className="precision-list">

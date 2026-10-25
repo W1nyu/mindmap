@@ -18,7 +18,7 @@ export interface IntegrationRule {
 
 /**
  * 서로 다른 모듈의 점수가 함께 높거나 낮을 때의 해석 가설입니다. 관련 모듈을 모두 마쳤을 때만 평가합니다.
- * 감정 조절(DERS) 점수는 높을수록 조절이 어렵다는 뜻입니다.
+ * 정서조절곤란(DERS) 점수는 높을수록 조절이 어렵다는 뜻입니다.
  */
 export const integrationRules: readonly IntegrationRule[] = [
   { id: "anxious-impulse", kind: "pattern", title: "관계의 불안이 행동으로", when: [{ module: "attachment", scale: "attachmentAnxiety", level: "high" }, { module: "emotion", scale: "impulse", level: "high" }],

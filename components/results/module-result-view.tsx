@@ -14,10 +14,10 @@ import { TypeCardView } from "./type-card";
 import { useModuleResult } from "./use-module-result";
 
 const descriptions: Record<ModuleId, string> = {
-  emotion: "속상한 순간 감정을 다루는 여섯 영역이에요. 점수가 높을수록 그 영역이 어렵다는 뜻이에요.",
+  emotion: "정서조절곤란의 여섯 하위요인이에요. 점수가 높을수록 그 영역의 조절이 어렵다는 뜻이에요.",
   defense: "스트레스 앞에서 자주 꺼내는 방어 방식이에요.",
   traits: "어느 쪽 끝도 더 나은 방향이 아니에요.",
-  attachment: "관계 불안과 친밀 회피, 두 축의 위치예요.",
+  attachment: "애착불안과 애착회피, 두 차원의 위치예요.",
 };
 
 export function ModuleResultView({ id, example, form }: { id: ModuleId; example: boolean; form?: FormId }) {

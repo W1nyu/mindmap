@@ -12,7 +12,7 @@ export function EmotionResult({ profile }: { profile: EmotionProfile }) {
     <QualityNote quality={profile.quality} />
     <div className="result-two-col">
       <section className="viz-card" aria-labelledby="emotion-radar-title">
-        <div className="viz-heading"><div><h2 id="emotion-radar-title">감정 조절의 여섯 영역</h2></div><span className="subtle-label">바깥일수록 어려움</span></div>
+        <div className="viz-heading"><div><h2 id="emotion-radar-title">정서조절곤란 여섯 하위요인</h2></div><span className="subtle-label">바깥일수록 어려움</span></div>
         <ProfileRadar data={scales.map((scale) => ({ name: meta(scale.scale).shortName, score: scale.score }))} />
         <p className="viz-caption">DERS 총점 {profile.total.sum}점 (범위 {profile.total.min}–{profile.total.max})</p>
       </section>

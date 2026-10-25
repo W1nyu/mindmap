@@ -19,7 +19,7 @@ export interface AttachmentProfile {
   quality: ResponseQuality;
 }
 
-/** 순수 함수: 관계 불안·친밀 회피 두 차원의 점수와 원 척도 평균. */
+/** 순수 함수: 애착불안·애착회피 두 차원의 점수와 원 척도 평균. */
 export function analyzeAttachment(responses: readonly LikertResponse[], instrument: LikertInstrument<AttachmentId>): AttachmentProfile {
   const result = scoreLikertInstrument(instrument, responses, ATTACHMENT_SCORING_VERSION);
   const axis = (id: AttachmentId) => {

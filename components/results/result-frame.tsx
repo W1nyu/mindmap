@@ -42,7 +42,7 @@ export function ResultFrame({ id, form, example, title, description, switcher, c
   const [confirmReset, setConfirmReset] = useState(false);
   const assessment = assessmentModules[id];
   return <>
-    <Link href={`/results${example ? "?example=1" : ""}`} className="text-link back-link no-print"><Icon name="chevron" size={14} style={{ transform: "rotate(180deg)" }} /> 전체 지형도</Link>
+    <Link href={`/results${example ? "?example=1" : ""}`} className="text-link back-link no-print"><Icon name="chevron" size={14} style={{ transform: "rotate(180deg)" }} /> 전체 결과</Link>
     <div className="section-heading result-header"><div><h1 className="page-title">{title}</h1><p className="page-description">{description}</p>{switcher && <p className="form-switch">{switcher}</p>}</div>{example && <span className="example-badge">예시</span>}</div>
     {!example && !storageAvailable && <p className="form-message" role="status">저장 기능을 사용할 수 없어 새로고침하면 응답과 결과가 사라집니다.</p>}
     {children}

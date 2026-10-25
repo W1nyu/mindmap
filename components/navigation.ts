@@ -9,7 +9,7 @@ export interface NavItem {
 export const mainNav: readonly NavItem[] = [
   { href: "/", label: "홈", icon: "home" },
   { href: "/questions", label: "검사", icon: "question" },
-  { href: "/results", label: "지형도", icon: "mountain" },
+  { href: "/results", label: "결과", icon: "layers" },
   { href: "/check-in", label: "상태 체크", icon: "pulse" },
 ];
 

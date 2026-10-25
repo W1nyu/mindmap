@@ -1,6 +1,6 @@
 # SelfMap
 
-감정 조절, 방어기제, 성격 5요인, 관계 애착을 공인 심리 척도로 측정해 마음 지형도와 유형 카드로 보여주는 자기이해 도구입니다. 진단을 제공하지 않고, 유형은 연구의 분류 기준에 따른 지금의 경향으로만 보여주며, 모든 점수는 결정론적 코드로 계산합니다.
+정서조절, 방어기제, 성격 5요인, 성인 애착을 공인 심리 척도로 측정해 통합 프로필과 유형 카드로 보여주는 자기이해 도구입니다. 진단을 제공하지 않고, 유형은 연구의 분류 기준에 따른 지금의 경향으로만 보여주며, 모든 점수는 결정론적 코드로 계산합니다.
 
 배포: https://mindmap-mu-seven.vercel.app
 
@@ -22,10 +22,10 @@ npm.cmd run smoke -- http://localhost:3000
 
 | 경로 | 기능 |
 | --- | --- |
-| `/` | 처음: 소개와 예시 지형도. 기록이 있으면 대시보드(지형도, 네 지역 진행, 요즘의 상태) |
+| `/` | 처음: 소개와 예시 프로필. 기록이 있으면 대시보드(통합 프로필, 네 검사 진행, 요즘의 상태) |
 | `/questions` | 검사 고르기: 모듈마다 간편 검사와 심층 검사 |
 | `/questions/[module]?form=brief\|deep` | 원 척도 그대로의 선택지(5·7·9점), 숫자 키·Enter |
-| `/results` | 나의 유형 카드, 마음 지형도, 강점과 살펴볼 점. `?example=1`은 고정 예시 응답 |
+| `/results` | 나의 유형 카드, 통합 프로필(모든 지표를 한 축에 놓고 함께 두드러진 지표를 선으로 연결), 강점과 살펴볼 점. `?example=1`은 고정 예시 응답 |
 | `/results/[module]?form=` | 유형 카드, 모듈 상세 차트, 점수의 확실도, 계산 근거(원 척도 평균) |
 | `/check-in` | 마음 상태 체크(WHO-5): 오늘·이번 주 단위로 기록, 다섯 영역, 시간에 따른 변화 |
 
@@ -33,14 +33,14 @@ npm.cmd run smoke -- http://localhost:3000
 
 ## 검사
 
-모든 검사는 논문으로 발표된 공인 척도입니다. 출처, 확인한 원문, 사용 조건, 유형 분류 기준은 [docs/instruments.md](docs/instruments.md)에 있습니다.
+모든 검사는 논문으로 발표된 공인 척도이며, 척도 이름은 한국판 척도의 표기를 따릅니다. 출처, 확인한 원문, 사용 조건, 용어, 유형 분류 기준은 [docs/instruments.md](docs/instruments.md)에 있습니다.
 
 | 모듈 | 간편 | 심층 | 응답 |
 | --- | --- | --- | --- |
-| 감정 조절 | DERS-18 | DERS-36 | 5점 |
+| 정서조절 | DERS-18 | DERS-36 | 5점 |
 | 방어기제 | DSQ-40 | DSQ-60 | 9점 |
 | 성격 5요인 | Mini-IPIP | IPIP-50 | 5점 |
-| 관계 애착 | ECR-S | ECR-R | 7점 |
+| 성인 애착 | ECR-S | ECR-R | 7점 |
 | 상태 체크 | WHO-5 | — | 6점 |
 
 ## 채점
@@ -73,7 +73,7 @@ npm.cmd run smoke -- http://localhost:3000
 ```text
 data/        문항, 척도 메타데이터, 해석 문구 (계산 없음)
 lib/         likert-engine, emotion/defense/trait/attachment-analysis, defense-levels, profile-types,
-             integration, terrain, balance, precision, wellbeing (순수 함수)
+             integration, profile-map, balance, precision, wellbeing (순수 함수)
 components/  questionnaire, module-hub, charts/, results/, wellbeing/, home/
 app/         App Router 경로, globals.css
 tests/       node:test 단위 테스트

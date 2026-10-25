@@ -32,19 +32,32 @@ export function computeModuleResult(module: ModuleId, form: FormId, responses: r
   }
 }
 
-/** 예시용 고정 응답: 문항 순서로 정해지는 의사난수(같은 입력 → 같은 응답). 실제 사용자 응답이 아닙니다. */
-export function exampleResponses(instrument: LikertInstrument): LikertResponse[] {
+/**
+ * 예시용 고정 응답: 척도마다 정한 목표 수준(0–1)에 문항 순서로 정해지는 작은 흔들림(±1)을 더합니다.
+ * 같은 입력 → 같은 응답이며, 실제 사용자 응답이 아닙니다. 연결 해석이 두어 개 보이도록 목표를 정했습니다.
+ */
+const exampleTargets: Record<ModuleId, Record<string, number>> = {
+  emotion: { impulse: 0.8, nonacceptance: 0.55, goals: 0.45, awareness: 0.3, strategies: 0.15, clarity: 0.4 },
+  defense: { adaptive: 0.8, inhibitory: 0.5, immediate: 0.3 },
+  traits: { openness: 0.7, conscientiousness: 0.6, extraversion: 0.35, agreeableness: 0.75, neuroticism: 0.65 },
+  attachment: { attachmentAnxiety: 0.8, attachmentAvoidance: 0.3 },
+};
+
+export function exampleResponses(module: ModuleId, form: FormId = "brief"): LikertResponse[] {
+  const instrument = assessmentModules[module].forms[form].instrument;
+  const tiers = form === "brief" ? dsq40Tiers : tiersFromLevels(instrument.scaleIds as readonly DefenseId[]);
+  const max = instrument.points - 1;
   let seed = 7;
   return instrument.items.map((item) => {
     seed = (seed * 48271) % 2147483647;
-    const spread = Math.max(1, Math.round((instrument.points - 1) / 2));
-    const base = Math.round((instrument.points - 1) / 2);
-    const value = Math.min(instrument.points - 1, Math.max(0, base + (seed % (spread * 2 + 1)) - spread));
-    return { kind: "likert" as const, questionId: item.id, value };
+    const key = module === "defense" ? tiers[item.scale as DefenseId] ?? "inhibitory" : item.scale;
+    const target = Math.round((exampleTargets[module][key] ?? 0.5) * max) + (seed % 3) - 1;
+    const value = Math.min(max, Math.max(0, target));
+    return { kind: "likert" as const, questionId: item.id, value: item.reverse ? max - value : value };
   });
 }
 
 /** 예시 결과도 같은 계산 함수만 거칩니다. 간편 검사 기준입니다. */
 export function computeExampleResult(module: ModuleId): ModuleResult {
-  return computeModuleResult(module, "brief", exampleResponses(assessmentModules[module].forms.brief.instrument));
+  return computeModuleResult(module, "brief", exampleResponses(module));
 }
