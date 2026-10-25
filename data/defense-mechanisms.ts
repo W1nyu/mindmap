@@ -161,4 +161,4 @@ export const balanceZones: readonly { id: BalanceZoneId; min: number; label: str
 ];
 
 /** 자기보고식 방어기제 측정의 알려진 한계입니다. */
-export const defenseMeasurementNote = "방어기제는 상당 부분 의식하지 못한 채 작동해요. 그래서 성숙한 대처는 스스로 알아차리기 쉬워 높게, 즉각 보호형 방어는 알아차리기 어려워 실제보다 낮게 응답될 수 있어요. 이 결과는 ‘내가 알아차린 나의 방식’에 가깝습니다.";
+export const defenseMeasurementNote = "방어기제는 상당 부분 의식하지 못한 채 작동해요. 이 결과는 ‘내가 알아차린 나의 방식’에 가깝습니다.";

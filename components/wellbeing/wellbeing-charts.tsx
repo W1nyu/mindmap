@@ -1,7 +1,7 @@
 "use client";
 
 import { wellbeingBands, wellbeingItems, wellbeingOptions, type WellbeingValue } from "@/data/wellbeing";
-import { MEANINGFUL_CHANGE, type WellbeingPoint } from "@/lib/wellbeing";
+import type { WellbeingPoint } from "@/lib/wellbeing";
 
 const bandLabel = (id: string) => wellbeingBands.find((band) => band.id === id)!.label;
 const shortDate = (iso: string) => new Date(iso).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" });
@@ -77,6 +77,5 @@ export function WellbeingTrend({ points }: { points: readonly WellbeingPoint[] }
         {(index % labelEvery === 0 || index === shown.length - 1) && <text className="wb-axis" x={x(index)} y={H - 8} textAnchor="middle">{shortDate(point.takenAt)}</text>}
       </g>)}
     </svg>
-    <figcaption className="viz-caption">바탕의 세 띠는 해석 구간(28 이하 · 29–50 · 51 이상)이에요. 직전 체크보다 {MEANINGFUL_CHANGE}점 이상 움직인 곳에는 변화 폭을 적었어요.{points.length > shown.length ? ` 최근 ${shown.length}회만 보여줘요.` : ""}</figcaption>
   </figure>;
 }

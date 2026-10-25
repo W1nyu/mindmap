@@ -68,14 +68,11 @@ function PeakPanel({ peak, previous, routes, peaks, example, interactive, onSele
   if (!peak) {
     const top = [...peaks].sort((a, b) => b.score - a.score || a.id.localeCompare(b.id)).slice(0, 3);
     return <aside className="terrain-panel" aria-live="polite">
-      <h3>지도를 읽는 법</h3>
-      <p>봉우리가 높을수록 그 경향이 응답에 자주 드러났다는 뜻이에요. 높고 낮음은 좋고 나쁨이 아니라, 지금 내 마음에서 눈에 띄는 지형일 뿐이에요.</p>
+      <h3>가장 높은 봉우리</h3>
       {top.length > 0 && <>
-        <button type="button" className="button button-secondary" onClick={() => onSelect(top[0].id)}><Icon name="compass" size={17} /> 높은 봉우리부터 둘러보기</button>
-        <p className="panel-hint">가장 높이 솟은 곳</p>
         <ul className="panel-routes">{top.map((item) => <li key={item.id} className={`module-${item.module}`}><button type="button" className="text-link" onClick={() => onSelect(item.id)}>{item.label} · {item.score}</button><b>{assessmentModules[item.module].title}</b></li>)}</ul>
       </>}
-      {routes.length > 0 && <p className="panel-hint">점선 길은 서로 다른 모듈의 점수가 함께 두드러질 때 이어지는 해석 가설이에요.</p>}
+      <p className="panel-hint">봉우리를 누르면 설명이 보여요.</p>
     </aside>;
   }
   const related = routes.filter((route) => route.from === peak.id || route.to === peak.id);

@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Icon } from "@/components/icon";
-import { WELLBEING_PERIOD_DAYS, wellbeingBands, wellbeingItems, wellbeingMeasurementNote, wellbeingOptions, type WellbeingValue } from "@/data/wellbeing";
-import { createCheck, itemAverages, MEANINGFUL_CHANGE, nextCheckDate, wellbeingTrend, type WellbeingCheck } from "@/lib/wellbeing";
+import { WELLBEING_PERIOD_DAYS, wellbeingBands, wellbeingItems, wellbeingOptions, type WellbeingValue } from "@/data/wellbeing";
+import { createCheck, itemAverages, nextCheckDate, wellbeingTrend, type WellbeingCheck } from "@/lib/wellbeing";
 import { ItemProfile, WellbeingGauge, WellbeingTrend } from "./wellbeing-charts";
 import { wellbeingStore } from "./wellbeing-store";
 
@@ -20,7 +19,7 @@ function CheckForm({ onDone, onCancel }: { onDone: (check: WellbeingCheck) => vo
     onDone(createCheck(answers as WellbeingValue[], new Date(), `w-${crypto.randomUUID()}`));
   }
   return <form className="viz-card wb-form" onSubmit={submit} aria-labelledby="wb-form-title">
-    <div className="viz-heading"><div><h2 id="wb-form-title">지난 2주 동안 나는…</h2><p className="viz-caption" style={{ marginTop: 2 }}>각 문장이 얼마나 자주 그랬는지 골라 주세요. 다섯 문장, 1분이면 끝나요.</p></div><span className="subtle-label">{answered} / {wellbeingItems.length}</span></div>
+    <div className="viz-heading"><div><h2 id="wb-form-title">지난 2주 동안 나는…</h2><p className="viz-caption" style={{ marginTop: 2 }}>얼마나 자주 그랬는지 골라 주세요.</p></div><span className="subtle-label">{answered} / {wellbeingItems.length}</span></div>
     <ol className="wb-questions">
       {wellbeingItems.map((item, index) => <li key={item.id}>
         <fieldset>
@@ -75,10 +74,10 @@ export function WellbeingCheckApp() {
         <WellbeingGauge point={latest} previous={previous} />
         <h3 className="wb-band-label">{band.label}</h3>
         <p className="viz-text">{band.text}</p>
-        {latest.band === "veryLow" && <Link className="button button-secondary" href="/support"><Icon name="heart" size={16} /> 도움 받을 곳 보기</Link>}
+        {latest.band === "veryLow" && <p className="wb-help"><Icon name="heart" size={15} /> 이야기 나눌 곳: 자살예방 상담전화 109 · 정신건강 위기상담 1577-0199 (24시간)</p>}
       </section>
       <section className="viz-card" aria-labelledby="wb-items-title">
-        <div className="viz-heading"><div><h2 id="wb-items-title">다섯 영역</h2><p className="viz-caption" style={{ marginTop: 2 }}>칸 수는 그 상태가 있었던 빈도(0–5)예요.{averages ? " 세로 표시는 지금까지의 평균이에요." : ""}</p></div></div>
+        <div className="viz-heading"><div><h2 id="wb-items-title">다섯 영역</h2>{averages && <p className="viz-caption" style={{ marginTop: 2 }}>세로 표시는 평균이에요.</p>}</div></div>
         <ItemProfile answers={latest.answers} averages={averages} />
         <div className="wb-item-notes">
           {latest.answers[wellbeingItems.indexOf(strongest)] >= 3 && <p><Icon name="leaf" size={15} /> <span>지금 나를 가장 받쳐 주는 영역은 <strong>{strongest.short}</strong>. 무엇이 이 부분을 지켜 주었는지 떠올려 보세요.</span></p>}
@@ -88,13 +87,13 @@ export function WellbeingCheckApp() {
     </div>
 
     <section className="viz-card" aria-labelledby="wb-trend-title">
-      <div className="viz-heading"><div><h2 id="wb-trend-title">시간에 따른 변화</h2><p className="viz-caption" style={{ marginTop: 2 }}>성격 경향과 달리 상태는 자주 바뀌어요. 2주마다 체크하면 흐름이 보여요.</p></div><span className="subtle-label">{checks.length}회 체크</span></div>
-      {points.length > 1 ? <WellbeingTrend points={points} /> : <p className="viz-text">체크가 두 번 이상 쌓이면 점수의 흐름과 {MEANINGFUL_CHANGE}점 이상의 의미 있는 변화를 선으로 보여드려요. 다음 체크는 <strong>{longDate(next)}</strong> 이후를 권해요.</p>}
+      <div className="viz-heading"><div><h2 id="wb-trend-title">시간에 따른 변화</h2></div><span className="subtle-label">{checks.length}회 체크</span></div>
+      {points.length > 1 ? <WellbeingTrend points={points} /> : <p className="viz-text">두 번 이상 체크하면 변화가 선으로 보여요. 다음 체크: <strong>{longDate(next)}</strong> 이후</p>}
     </section>
 
     <div className="wb-actions">
       <button type="button" className="button button-primary" onClick={() => go("form")}><Icon name="pulse" size={17} /> 새로 체크하기</button>
-      <p className="viz-caption">{recent ? `WHO-5는 지난 2주를 묻기 때문에 ${longDate(next)} 이후에 다시 체크하면 겹치지 않아요.` : "지난 체크에서 2주가 지났어요. 지금 체크하면 새로운 2주를 볼 수 있어요."}</p>
+      <p className="viz-caption">{recent ? `다음 체크 권장: ${longDate(next)} 이후` : "새로 체크할 때가 됐어요."}</p>
     </div>
 
     <section className="viz-card" aria-labelledby="wb-history-title">
@@ -109,6 +108,6 @@ export function WellbeingCheckApp() {
       </li>)}</ul>
     </section>
 
-    <div className="measurement-note"><Icon name="shield" size={16} /><p>{wellbeingMeasurementNote} 점수 구간은 Topp 외(2015) 체계적 고찰에서 널리 쓰는 기준이에요. 문장은 SelfMap이 옮긴 표현이라 공식 한국어판과 다를 수 있어요.</p></div>
+    <p className="viz-caption">WHO-5 웰빙 지표(Topp 외, 2015) · 10점 이상 변화를 의미 있는 변화로 표시해요.</p>
   </div>;
 }

@@ -3,7 +3,7 @@
 /*
  * SelfMap 디자인 시스템 v4 — "마음 지형도"
  * 차분한 보랏빛 잉크와 안개빛 종이, 한글 세리프 제목(Hahmlet)과 본문 산세리프(IBM Plex Sans KR).
- * 모든 색은 토큰으로만 쓰고, 어두운 테마는 토큰 값만 바꿉니다.
+ * 모든 색은 토큰으로만 씁니다. 밝은 테마 하나만 둡니다.
  * 방어 수준 색(--tier-*)은 색각 이상 시뮬레이션을 거친 기존 값을 유지합니다.
  */
 :root {
@@ -47,7 +47,6 @@
   --font-body: var(--font-plex), "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
   --font-display: var(--font-hahmlet), "Nanum Myeongjo", "AppleMyungjo", serif;
   --sidebar-w: 264px;
-  /* 글자 크기 배율: 보통 1, 크게 1.12 (html[data-text="large"]) */
   --fs: 1;
   --bottom-nav-h: 64px;
   /* 기존 코드 호환 별칭 */
@@ -55,44 +54,7 @@
   --soft: var(--paper-2);
 }
 
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --paper: #13121a;
-  --paper-2: #1a1923;
-  --card: #1d1c28;
-  --card-2: #222130;
-  --ink: #eceaf5;
-  --text-2: #c9c6da;
-  --muted: #a6a2bb;
-  --faint: #8f8ba8;
-  --line: #2c2a3b;
-  --line-strong: #3d3a51;
-  --primary: #a99cf2;
-  --primary-hover: #bcb2f6;
-  --on-primary: #17132c;
-  --primary-soft: #28243f;
-  --primary-soft-2: #332e52;
-  --primary-text: #c0b6f8;
-  --contour: #5f5694;
-  --contour-strong: #b2a6f5;
-  --land: #1a1925;
-  --warn-bg: #2b2414;
-  --warn-line: #463918;
-  --warn-text: #e8c785;
-  --danger: #ee9c86;
-  --danger-bg: #2e1d19;
-  --danger-line: #4a2c24;
-  --good-bg: #17291f;
-  --good-text: #8fd6b2;
-  --tier-adaptive: #33a070;
-  --tier-inhibitory: #cc7f22;
-  --tier-immediate: #5b8ad8;
-  --shadow-1: 0 1px 2px rgb(0 0 0 / 30%);
-  --shadow-2: 0 12px 32px -14px rgb(0 0 0 / 70%);
-  --shadow-3: 0 30px 70px -20px rgb(0 0 0 / 80%);
-}
 
-:root[data-text="large"] { --fs: 1.12; }
 
 @theme inline {
   --color-background: var(--paper);
@@ -397,9 +359,6 @@ section[aria-labelledby] > .section-heading { margin-bottom: 16px; }
 .module-defense { --module-color: var(--tier-adaptive); }
 .module-traits { --module-color: #b8678f; }
 .module-attachment { --module-color: #3f86a6; }
-:root[data-theme="dark"] .module-reaction { --module-color: #a68ef0; }
-:root[data-theme="dark"] .module-traits { --module-color: #e08fb6; }
-:root[data-theme="dark"] .module-attachment { --module-color: #69b3d3; }
 .terrain-panel { display: flex; flex-direction: column; gap: 12px; padding: 22px; border-left: 1px solid var(--line); background: var(--card); min-width: 0; }
 .terrain-panel h3 { font-family: var(--font-display); font-size: calc(22px * var(--fs)); font-weight: 600; }
 .terrain-panel .panel-module { display: inline-flex; align-items: center; gap: 8px; font-size: calc(13.5px * var(--fs)); font-weight: 600; color: var(--muted); }
@@ -1132,7 +1091,6 @@ section[aria-labelledby] > .section-heading { margin-bottom: 16px; }
 @media (max-width: 1023px) { .section-jump { top: 60px; } }
 :where(h2[id$="-title"]) { scroll-margin-top: 72px; }
 @media (max-width: 1023px) { :where(h2[id$="-title"]) { scroll-margin-top: 130px; } }
-:root[data-theme="dark"] .moment-cell[data-level="3"] { background: color-mix(in srgb, var(--primary) 80%, var(--paper-2)); }
 @media (max-width: 640px) { .flow-label { font-size: calc(17px * var(--fs)); } .flow-count { font-size: calc(14px * var(--fs)); } }
 .story-card { margin-top: 22px; }
 .story-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
@@ -1301,3 +1259,13 @@ section[aria-labelledby] > .section-heading { margin-bottom: 16px; }
   .dmrs-level { grid-template-columns: 26px minmax(0, 1fr) 54px; padding: 9px 10px; gap: 6px 8px; }
   .dmrs-badge { width: 24px; height: 24px; }
 }
+
+/* ---------- 단순화한 화면 ---------- */
+.home-module h3 { display: flex; align-items: center; gap: 10px; }
+.module-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--module-color); flex-shrink: 0; }
+.home-module p { flex: none; }
+.module-meta { margin: 6px 0 14px; font-size: calc(14px * var(--fs)); color: var(--muted); }
+.wb-help { display: flex; gap: 8px; align-items: flex-start; margin-top: 12px; padding: 10px 12px; border-radius: var(--radius-s); background: var(--warn-bg); color: var(--warn-text); font-size: calc(14px * var(--fs)); line-height: 1.6; }
+.wb-help svg { flex-shrink: 0; margin-top: 3px; }
+.page-footer { justify-content: center; }
+.dash-hero { align-items: center; }

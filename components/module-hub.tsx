@@ -14,12 +14,10 @@ function ModuleCard({ id, state }: { id: ModuleId; state: SessionSnapshot }) {
   const completed = Boolean(state.session?.completed);
   const status = !state.ready ? "확인 중" : completed ? "완료" : answered > 0 ? `${answered} / ${total} 응답` : "시작 전";
   return <article className={`module-card module-${id} ${completed ? "is-complete" : ""}`}>
-    <div className="module-card-top"><span className="module-region"><i />{assessmentModules[id].title.split(" ")[0]} 지역</span><span className={`module-status ${completed ? "done" : answered > 0 ? "progress" : ""}`}>{completed && <Icon name="check" size={12} />} {status}</span></div>
+    <div className="module-card-top"><span className="module-region"><i /></span><span className={`module-status ${completed ? "done" : answered > 0 ? "progress" : ""}`}>{completed && <Icon name="check" size={12} />} {status}</span></div>
     <h2>{assessment.title}</h2>
     <p className="module-tagline">{assessment.tagline}</p>
-    <p className="module-description">{assessment.description}</p>
-    <dl className="module-facts"><div><dt>문항</dt><dd>{total}개</dd></div><div><dt>예상 시간</dt><dd>약 {assessment.estimatedMinutes}분</dd></div></dl>
-    <p className="module-basis">{assessment.basis}</p>
+    <p className="module-meta">{total}문항 · 약 {assessment.estimatedMinutes}분</p>
     <div className="module-progress" aria-hidden="true"><span style={{ width: `${(answered / total) * 100}%` }} /></div>
     <div className="module-actions">
       <Link className="button button-primary" href={`/questions/${id}`}>{completed ? "응답 수정" : answered > 0 ? "이어서 하기" : "시작하기"} <Icon name="arrow" size={16} /></Link>
@@ -39,8 +37,7 @@ export function ModuleHub() {
   };
   const completedCount = moduleIds.filter((id) => states[id].session?.completed).length;
   return <>
-    <p className="hub-summary" role="status">{completedCount === 0 ? "원하는 모듈부터 자유롭게 시작하세요. 순서는 상관없어요." : `${moduleIds.length}개 중 ${completedCount}개 모듈을 마쳤어요. 마친 모듈은 ‘나의 결과’ 지도에 함께 그려져요.`}</p>
+    {completedCount > 0 && <p className="hub-summary" role="status">{moduleIds.length}개 중 {completedCount}개 완료</p>}
     <div className="module-grid">{moduleIds.map((id) => <ModuleCard key={id} id={id} state={states[id]} />)}</div>
-    <aside className="hub-extra"><div><span className="eyebrow small">BONUS</span><h2>상황 반응 살펴보기</h2><p>일상 장면 8개에서 가장 먼저 나올 것 같은 반응을 골라요. 방어기제 프로필과 비교해 볼 수 있어요. 약 2분.</p></div><Link className="button button-secondary" href="/scenarios">시작하기 <Icon name="arrow" size={15} /></Link></aside>
   </>;
 }

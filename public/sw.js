@@ -4,8 +4,8 @@
  * - /_next/static, 아이콘: 캐시 우선(파일 이름에 해시가 있어 바뀌지 않음)
  * - /api/ 요청과 다른 출처 요청은 건드리지 않습니다. 사용자 데이터는 캐시하지 않습니다.
  */
-const CACHE = "selfmap-v2";
-const CORE = ["/", "/questions", "/results", "/journal", "/review", "/practice", "/learn", "/learn/quiz", "/scenarios", "/support", "/my-data",
+const CACHE = "selfmap-v3";
+const CORE = ["/", "/questions", "/results", "/check-in",
   "/questions/reaction", "/questions/defense", "/questions/traits", "/questions/attachment"];
 
 self.addEventListener("install", (event) => {

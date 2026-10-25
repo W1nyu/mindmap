@@ -25,7 +25,6 @@ export function WellbeingSummaryCard() {
         <line x1="0" x2="160" y1={36 - 0.5 * 36} y2={36 - 0.5 * 36} className="wb-grid" />
         <polyline className="wb-line" points={recent.map((point, index) => `${(index / (recent.length - 1)) * 156 + 2},${(36 - (point.score / 100) * 32 - 2).toFixed(1)}`).join(" ")} />
       </svg>}
-      <p className="viz-caption">WHO-5 웰빙 지표 · 최근 2주 기준</p>
-    </> : <p className="viz-text">네 모듈이 ‘평소의 나’라면 이건 ‘요즘의 나’예요. 다섯 문장, 1분이면 최근 2주의 웰빙을 0–100으로 볼 수 있어요.</p>}
+    </> : <p className="viz-text">5문장, 1분이면 최근 2주의 상태를 볼 수 있어요.</p>}
   </section>;
 }

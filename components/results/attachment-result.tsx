@@ -29,21 +29,19 @@ export function AttachmentResult({ profile }: { profile: AttachmentProfile }) {
     <QualityNote quality={profile.quality} />
     <div className="result-two-col">
       <section className="viz-card" aria-labelledby="plane-title">
-        <div className="viz-heading"><div><span className="eyebrow small">TWO DIMENSIONS</span><h2 id="plane-title">가까운 관계 속 나의 위치</h2></div><span className="subtle-label">옅은 띠: 가운데 범위</span></div>
+        <div className="viz-heading"><div><h2 id="plane-title">가까운 관계 속 나의 위치</h2></div><span className="subtle-label">옅은 띠: 가운데 범위</span></div>
         <AttachmentPlane anxiety={profile.anxiety.score} avoidance={profile.avoidance.score} />
-        <p className="viz-caption">가로는 친밀 회피, 세로는 관계 불안이에요. 칸을 나누는 이름은 붙이지 않았어요. 두 차원은 연속적이고, 관계와 시기에 따라 위치가 달라질 수 있어요.</p>
+        <p className="viz-caption">가로는 친밀 회피, 세로는 관계 불안이에요.</p>
       </section>
       <section className="viz-card" aria-labelledby="axes-title">
-        <div className="viz-heading"><div><span className="eyebrow small">EACH AXIS</span><h2 id="axes-title">두 축이 말해 주는 것</h2></div></div>
+        <div className="viz-heading"><div><h2 id="axes-title">두 축이 말해 주는 것</h2></div></div>
         <div className="axis-notes">{axes.map(({ meta, value }) => <article key={meta.id}>
           <div className="trait-row-head"><h3>{meta.name}</h3><span className="trait-score">{value.score}<small> / 100 · {leaningLabel[value.leaning]}</small></span></div>
           <div className="trait-track" aria-hidden="true"><span className="trait-mid" style={{ left: `${LOW_LEANING_MAX + 1}%`, width: `${HIGH_LEANING_MIN - LOW_LEANING_MAX - 2}%` }} /><span className="trait-marker" style={{ left: `${value.score}%` }} /></div>
-          <p className="trait-description">{meta.description}</p>
           <p className="viz-text">{meta[value.leaning]}</p>
         </article>)}</div>
         {profile.combined && <p className="combined-note">{profile.combined}</p>}
       </section>
     </div>
-    <div className="measurement-note"><p>애착 경향은 어린 시절의 경험뿐 아니라 지금의 관계, 상대, 삶의 상황에 따라 계속 달라질 수 있어요. 한 관계에서의 모습이 모든 관계를 대표하지 않으며, 안정적인 관계 경험이 쌓이면 위치도 움직일 수 있어요.</p></div>
   </div>;
 }
