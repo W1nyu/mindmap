@@ -19,7 +19,8 @@ export interface ProfileRow {
   score: number;
   /** 원 척도 평균 */
   mean: number;
-  points: number;
+  /** 원 척도의 가장 큰 번호(평균을 읽는 기준) */
+  max: number;
   /** 비교 기준선(0–100). 애착은 ECR-R 표본 평균 */
   reference?: number;
 }
@@ -46,38 +47,40 @@ export interface ProfileLink {
 }
 
 const directions: Record<ModuleId, string> = {
+  defense: "세 방어 스타일",
   emotion: "높을수록 조절 어려움 · 1–5",
-  defense: "세 방어 스타일 · 1–9",
   traits: "다섯 요인 · 1–5",
   attachment: "높을수록 불안·회피 · 1–7",
 };
 
 const slotCount: Record<ModuleId, number> = { emotion: 6, defense: 3, traits: 5, attachment: 2 };
 
-const toScore = (mean: number, points: number) => Math.round(((mean - 1) / (points - 1)) * 100);
+const toScore = (mean: number, origin: number, points: number) => Math.round(((mean - origin) / (points - 1)) * 100);
 
 export function profileGroups(results: ModuleResults): ProfileGroup[] {
   return moduleIds.map((module) => {
     const result = results[module];
     const meta = assessmentModules[module];
     if (!result) return { module, title: meta.title, direction: directions[module], rows: [], done: false, slots: slotCount[module] };
-    const points = result.profile.result.points;
+    const { points, origin } = result.profile.result;
+    const max = origin + points - 1;
+    const direction = module === "defense" ? `세 방어 스타일 · ${origin}–${max}` : directions[module];
     let rows: ProfileRow[];
     if (result.module === "defense") {
       rows = result.profile.tiers.map((tier) => ({
         id: `defense:${tier.tier}`, module, scale: tier.tier, label: defenseTiers.find((item) => item.id === tier.tier)!.name, short: defenseTiers.find((item) => item.id === tier.tier)!.name,
-        score: tier.score, mean: tier.mean, points,
+        score: tier.score, mean: tier.mean, max,
       }));
     } else {
       rows = result.profile.result.scales.map((scale) => ({
         id: `${module}:${scale.scale}`, module, scale: scale.scale,
         label: meta.scales.find((item) => item.id === scale.scale)?.name ?? scale.scale,
         short: meta.scales.find((item) => item.id === scale.scale)?.shortName ?? scale.scale,
-        score: scale.score, mean: scale.mean, points,
-        reference: module === "attachment" ? toScore(scale.scale === "attachmentAnxiety" ? ATTACHMENT_NORMS.anxiety : ATTACHMENT_NORMS.avoidance, points) : undefined,
+        score: scale.score, mean: scale.mean, max,
+        reference: module === "attachment" ? toScore(scale.scale === "attachmentAnxiety" ? ATTACHMENT_NORMS.anxiety : ATTACHMENT_NORMS.avoidance, origin, points) : undefined,
       }));
     }
-    return { module, title: meta.title, direction: directions[module], rows, done: true, slots: rows.length };
+    return { module, title: meta.title, direction, rows, done: true, slots: rows.length };
   });
 }
 

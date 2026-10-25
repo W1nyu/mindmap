@@ -2,6 +2,7 @@ import { ATTACHMENT_NORMS } from "../data/attachment";
 import { emotionMeta } from "../data/emotion";
 import type { ModuleId } from "../data/modules";
 import type { TraitId } from "../types/traits";
+import { dmrsProfile } from "./defense-levels";
 import type { ModuleResult } from "./module-results";
 
 /**
@@ -69,7 +70,9 @@ export function typeCard(result: ModuleResult): TypeCard {
       const top = [...tiers].sort((a, b) => b.mean - a.mean)[0];
       const names = { adaptive: ["성숙한 방어 우세", "Mature style", "힘든 순간에도 감정을 알아차리고 현실적으로 다루는 방식에 많이 기대요."], inhibitory: ["신경증적 방어 우세", "Neurotic style", "감정을 마음속에서 바꾸거나 거리를 두어 다루는 방식에 많이 기대요."], immediate: ["미성숙한 방어 우세", "Immature style", "강한 스트레스 앞에서 감정과 현실을 빠르게 밀어내 마음을 지키는 편이에요."] } as const;
       const [name, academic, summary] = names[top.tier];
-      return { module: "defense", name, academic, summary, basis: `세 방어 스타일 중 평균이 가장 높음(${top.mean.toFixed(1)} / 9)` };
+      const odf = dmrsProfile(result.profile.result.scales).index;
+      const max = result.profile.result.origin + result.profile.result.points - 1;
+      return { module: "defense", name, academic, summary, basis: `세 범주 중 평균이 가장 높음(${top.mean.toFixed(1)} / ${max})${odf !== null ? ` · ODF ${odf.toFixed(2)}` : ""}` };
     }
     case "traits": {
       const scores = new Map(result.profile.leanings.map((item) => [item.trait, item.score]));

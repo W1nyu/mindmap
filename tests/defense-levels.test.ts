@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { dsq40, dsq40Tiers, dsq60 } from "../data/defense-dsq";
+import { dmrsSr30 } from "../data/defense-dmrs";
+import { dsq40, dsq40Tiers } from "../data/defense-dsq";
 import { dmrsLevels } from "../data/defense-levels";
-import { defenseMechanisms } from "../data/defense-mechanisms";
+import { defenseMechanisms, defenseMeta } from "../data/defense-mechanisms";
 import { analyzeDefenses, tiersFromLevels } from "../lib/defense-analysis";
 import { dmrsProfile } from "../lib/defense-levels";
 import type { LikertInstrument, LikertResponse } from "../types/assessment";
@@ -11,16 +12,24 @@ import { defenseIds, type DefenseId } from "../types/defense";
 const answer = (instrument: LikertInstrument<DefenseId>, valueFor: (defense: DefenseId) => number): LikertResponse[] =>
   instrument.items.map((item) => ({ kind: "likert", questionId: item.id, value: valueFor(item.scale) }));
 
-test("every defense has metadata and a DMRS level; DSQ-60 covers all seven levels", () => {
+test("every defense has metadata and a DMRS level; DMRS-SR-30 covers all seven levels", () => {
   assert.deepEqual(defenseMechanisms.map((item) => item.id).sort(), [...defenseIds].sort());
   assert.deepEqual(dmrsLevels.map((level) => level.level), [7, 6, 5, 4, 3, 2, 1]);
-  const dmrs = dmrsProfile(analyzeDefenses(answer(dsq60, () => 4), dsq60, tiersFromLevels(dsq60.scaleIds)).result.scales);
+  const dmrs = dmrsProfile(analyzeDefenses(answer(dmrsSr30, () => 2), dmrsSr30, tiersFromLevels(dmrsSr30.scaleIds)).result.scales);
   assert.ok(dmrs.levels.every((level) => level.measured));
 });
 
-test("DSQ-60 styles come from DMRS levels: 8 mature, 7 neurotic, 15 immature", () => {
-  const tiers = Object.values(tiersFromLevels(dsq60.scaleIds));
-  assert.deepEqual(["adaptive", "inhibitory", "immediate"].map((tier) => tiers.filter((value) => value === tier).length), [8, 7, 15]);
+test("DMRS-SR-30 categories come from DMRS levels: 8 mature, 7 neurotic, 13 immature defenses", () => {
+  const tiers = Object.values(tiersFromLevels(dmrsSr30.scaleIds));
+  assert.deepEqual(["adaptive", "inhibitory", "immediate"].map((tier) => tiers.filter((value) => value === tier).length), [8, 7, 13]);
+});
+
+test("ODF follows the DMRS-SR-30 proportional scoring: equal answers give the item-weighted mean level", () => {
+  const scales = analyzeDefenses(answer(dmrsSr30, () => 3), dmrsSr30, tiersFromLevels(dmrsSr30.scaleIds)).result.scales;
+  const expected = dmrsSr30.items.reduce((sum, item) => sum + defenseMeta(item.scale).level, 0) / dmrsSr30.items.length;
+  assert.equal(dmrsProfile(scales).index, Math.round(expected * 100) / 100);
+  const onlyMature = analyzeDefenses(answer(dmrsSr30, (id) => (defenseMeta(id).level === 7 ? 4 : 0)), dmrsSr30, tiersFromLevels(dmrsSr30.scaleIds)).result.scales;
+  assert.equal(dmrsProfile(onlyMature).index, 7);
 });
 
 test("equal answers give the defense-count-weighted mean level and shares summing to 100", () => {

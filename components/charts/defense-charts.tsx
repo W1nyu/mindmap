@@ -10,13 +10,13 @@ const tierClass = (tier: DefenseTierId) => `tier-${tier}`;
 /** 세 수준의 점수 타일과 상대 구성비(합 100) 막대. 색 외에 수준 이름과 수치를 항상 함께 표시합니다. */
 export function TierSummary({ profile }: { profile: DefenseProfile }) {
   return <section className="viz-card" aria-labelledby="tier-summary-title">
-    <div className="viz-heading"><div><h2 id="tier-summary-title">세 가지 방어 스타일</h2></div><span className="subtle-label">평균 1–9</span></div>
+    <div className="viz-heading"><div><h2 id="tier-summary-title">세 가지 방어 스타일</h2></div><span className="subtle-label">평균 {profile.result.origin}–{profile.result.origin + profile.result.points - 1}</span></div>
     <div className="tier-tiles">{profile.tiers.map((tier) => {
       const meta = tierMeta(tier.tier);
       return <article key={tier.tier} className={`tier-tile ${tierClass(tier.tier)}`}>
         <span className="tier-swatch" aria-hidden="true" />
         <h3>{meta.name}</h3>
-        <p className="tier-score"><strong>{tier.mean.toFixed(1)}</strong><small> / 9 · {meta.academicName}</small></p>
+        <p className="tier-score"><strong>{tier.mean.toFixed(1)}</strong><small> / {profile.result.origin + profile.result.points - 1} · {meta.academicName}</small></p>
         <div className="mini-track" aria-hidden="true"><span style={{ width: `${tier.score}%` }} /></div>
         <p className="tier-defenses">{tier.defenses.map((id) => defenseMeta(id).name).join(" · ")}</p>
       </article>;
@@ -43,7 +43,7 @@ export function DefenseLadder({ profile }: { profile: DefenseProfile }) {
         <ul>{rows.map((scale) => {
           const meta = defenseMeta(scale.scale);
           const band = bandLabels[scoreBand(scale.score)];
-          return <li key={scale.scale} data-tip={`${meta.name}(${meta.englishName}) · 평균 ${scale.mean.toFixed(1)} · ${band} · 응답 ${scale.evidence.map((item) => item.rawValue + 1).join(", ")}`}>
+          return <li key={scale.scale} data-tip={`${meta.name}(${meta.englishName}) · 평균 ${scale.mean.toFixed(1)} · ${band} · 응답 ${scale.evidence.map((item) => item.rawValue + profile.result.origin).join(", ")}`}>
             <span className="ladder-name">{meta.name}</span>
             <span className="ladder-track" aria-hidden="true"><span style={{ width: `${scale.score}%` }} /></span>
             <span className="ladder-value">{scale.mean.toFixed(1)}<small>{band}</small></span>
@@ -55,7 +55,7 @@ export function DefenseLadder({ profile }: { profile: DefenseProfile }) {
 }
 
 /**
- * DMRS 7단계 위계. 위가 7(높은 적응)이고, 왼쪽 레일의 표시는 점수 가중 평균 수준이에요.
+ * DMRS 7단계 위계. 위가 7(고적응)이고, 왼쪽 레일의 표시는 ODF(응답 비율로 가중한 평균 단계)예요.
  * 막대는 전체 방어 점수 중 그 수준의 몫, 칩은 그 수준에 속한 방어와 점수입니다.
  */
 export function DmrsHierarchy({ profile }: { profile: DefenseProfile }) {
@@ -65,7 +65,7 @@ export function DmrsHierarchy({ profile }: { profile: DefenseProfile }) {
   const markerTop = dmrs.index === null ? null : (((7 - dmrs.index) + 0.5) / 7) * 100;
   return <section className="viz-card" aria-labelledby="dmrs-title">
     <div className="viz-heading"><div><h2 id="dmrs-title">방어 위계 7단계</h2><p className="viz-caption" style={{ marginTop: 2 }}>DMRS(Perry) 위계 · 위로 갈수록 적응적인 방식이에요.</p></div></div>
-    {dmrs.index !== null && top ? <p className="dmrs-summary"><span>점수 가중 평균 수준</span><strong>{dmrs.index.toFixed(2)}</strong><small>/ 7</small><span className="dmrs-summary-text">가장 큰 몫은 {top.level}단계 {metaOf.get(top.level)!.name}({top.share}%)이에요.</span></p>
+    {dmrs.index !== null && top ? <p className="dmrs-summary"><span>ODF(전반 방어 기능)</span><strong>{dmrs.index.toFixed(2)}</strong><small>/ 7</small><span className="dmrs-summary-text">가장 큰 몫은 {top.level}단계 {metaOf.get(top.level)!.name}({top.share}%)이에요.</span></p>
       : <p className="viz-text">모든 방어 점수가 0이라 위계 위치를 계산하지 않았어요.</p>}
     <div className="dmrs">
       <div className="dmrs-rail" aria-hidden="true">
@@ -92,6 +92,6 @@ export function DmrsHierarchy({ profile }: { profile: DefenseProfile }) {
     <details className="dmrs-details"><summary>각 단계는 어떤 방식인가요?</summary>
       <dl>{dmrsLevels.filter((meta) => dmrs.levels.find((level) => level.level === meta.level)?.measured).map((meta) => <div key={meta.level}><dt>{meta.level}단계 · {meta.name}</dt><dd>{meta.description}</dd></div>)}</dl>
     </details>
-    <p className="viz-caption">가중 평균 수준은 DMRS의 전반 방어 기능(ODF) 계산 방식을 따른 참고 지표예요(자기보고판 DMRS-SR-30, Di Giuseppe 외, 2020). 누구나 상황에 따라 여러 단계를 오가요.</p>
+    <p className="viz-caption">{profile.result.instrumentId === "dmrs-sr-30" ? "ODF(전반 방어 기능)는 DMRS-SR-30의 채점 방식대로 응답 비율로 가중한 평균 단계예요. 5 근처가 신경증적·미성숙 범주의 경계로 알려져 있어요(Di Giuseppe 외, 2020)." : "DSQ-40 응답에 DMRS-SR-30의 ODF 계산을 적용한 참고 지표예요."} 누구나 상황에 따라 여러 단계를 오가요.</p>
   </section>;
 }

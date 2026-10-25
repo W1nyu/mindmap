@@ -3,9 +3,8 @@ import type { DefenseId, DefenseTierId } from "../types/defense";
 import { agree9, buildInstrument } from "./instrument-kit";
 
 /**
- * 방어 스타일 질문지(DSQ). 간편 검사는 DSQ-40(Andrews, Singh & Bond, 1993; 20개 방어 × 2문항),
- * 심층 검사는 DSQ-60(Trijsburg & Bond; Thygesen 외, 2008; 30개 방어 × 2문항). 둘 다 9점 척도이며 역채점이 없습니다.
- * 방어 점수는 두 문항의 평균입니다. DSQ-60 채점 키는 Crașovan & Maricuțoiu(2012)의 부록을 따랐습니다.
+ * 방어 스타일 질문지 DSQ-40(Andrews, Singh & Bond, 1993; 20개 방어 × 2문항). 9점 척도이며 역채점이 없습니다.
+ * 방어 점수는 두 문항의 평균입니다. 평소의 방어 스타일을 묻는 심층 검사로 씁니다.
  * DSQ의 저작권은 개발자(Bond)에게 있으며 연구·교육 목적의 비상업적 사용을 전제로 합니다.
  * 문장은 SelfMap이 옮긴 한국어로, 공식 한국어판과 다를 수 있습니다.
  */
@@ -81,77 +80,3 @@ export const dsq40Tiers: Partial<Record<DefenseId, DefenseTierId>> = {
   projection: "immediate", passiveAggression: "immediate", actingOut: "immediate", isolation: "immediate", devaluation: "immediate",
   fantasy: "immediate", denial: "immediate", displacement: "immediate", dissociation: "immediate", splitting: "immediate", rationalization: "immediate", somatization: "immediate",
 };
-
-const dsq60Texts = [
-  dsq40Texts[0],
-  "사람들은 나를 자주 뾰로통한 사람이라고 한다.",
-  dsq40Texts[1],
-  dsq40Texts[2],
-  "사람에 대한 생각이 자주 바뀐다. 어떤 때는 대단하게 여기다가 어떤 때는 쓸모없다고 생각한다.",
-  dsq40Texts[3],
-  dsq40Texts[4],
-  dsq40Texts[5],
-  dsq40Texts[6],
-  "누군가와 갈등이 생기면 그 일에서 내 몫은 무엇이었는지 생각해 본다.",
-  dsq40Texts[7],
-  "함께 있는 사람들보다 내가 낫다고 느낄 때가 많다.",
-  "누군가 내가 가진 모든 것을 감정적으로 빼앗아 가고 있다.",
-  "정말 위험할 때, 마치 내가 거기 없는 것처럼 두려움을 느끼지 않는다.",
-  "부당한 대우를 받으면 내 권리를 주장한다.",
-  "슈퍼맨이라도 된 것처럼 위험을 다룬다.",
-  dsq40Texts[9],
-  dsq40Texts[10],
-  "사실 나는 꽤 쓸모없는 사람이다.",
-  "사람들을 대하다 보면 그 사람들도 결국 내가 느끼는 감정을 느끼게 된다.",
-  dsq40Texts[13],
-  "화가 나면 물러나 버린다.",
-  "어려움에 처하면 현실이 아닌 것처럼 느껴질 때가 많다.",
-  dsq40Texts[14],
-  "내 감정보다는 추상적인 것에 대해 이야기하는 편이 좋다.",
-  dsq40Texts[15],
-  dsq40Texts[16],
-  "사람들이 나에게 화를 내면, 그들이 과장하고 있다고 생각하는 편이다.",
-  dsq40Texts[18],
-  "누군가 나에게 화를 내면, 평소엔 넘기던 일에도 짜증이 나는 편이다.",
-  dsq40Texts[19],
-  "초등학교 시절의 일이 거의 기억나지 않는다.",
-  "슬프면 물러나 버린다.",
-  dsq40Texts[20],
-  "사실 나는 사람들이 생각하는 것보다 못한 사람이다.",
-  dsq40Texts[21],
-  dsq40Texts[22],
-  dsq40Texts[23],
-  "불쾌한 일을 겪으면 다음 날 무슨 일이었는지 잊어버릴 때가 있다.",
-  "다른 사람을 도우면 기분이 좋아진다.",
-  dsq40Texts[24],
-  dsq40Texts[25],
-  dsq40Texts[27],
-  "‘누구에게나 좋은 점이 조금은 있다’는 말은 틀렸다. 나쁜 사람은 완전히 나쁘다.",
-  "내가 한 일이 잘 안 되면, 무엇을 놓쳤는지 알아보려 한다.",
-  "사람들은 나에게 정직하지 않은 편이다.",
-  dsq40Texts[29],
-  dsq40Texts[30],
-  dsq40Texts[31],
-  "누군가 나를 거슬리게 하면, 상대의 감정을 상하게 하지 않으면서 그 사실을 말한다.",
-  dsq40Texts[33],
-  "기분이 안 좋을 때 누군가와 함께 있으려 한다.",
-  dsq40Texts[34],
-  dsq40Texts[35],
-  "내가 느끼는 것을 그대로 말하기보다 내 생각을 길게 설명한다.",
-  dsq40Texts[36],
-  "우울하거나 불안할 때 창의적이거나 몸을 쓰는 활동을 하고 싶어진다.",
-  "위기에 처하면 걱정을 함께 나눌 사람을 찾을 것이다.",
-  dsq40Texts[39],
-  "신나는 일이 생기면 사소한 세부 사항에 지나치게 신경 쓰는 편이다.",
-] as const;
-
-const dsq60Key: Key = {
-  altruism: [1, 40], passiveAggression: [2, 37], suppression: [3, 41], sublimation: [4, 57], splittingOther: [5, 36],
-  rationalization: [6, 26], humor: [7, 42], projection: [8, 46], reactionFormation: [9, 43], selfObservation: [10, 45],
-  denial: [11, 28], devaluationOther: [12, 17], projectiveIdentification: [13, 20], dissociation: [14, 23], selfAssertion: [15, 50],
-  omnipotence: [16, 24], actingOut: [18, 31], devaluationSelf: [19, 35], fantasy: [21, 27], withdrawal: [22, 33],
-  intellectualization: [25, 55], splittingSelf: [29, 44], displacement: [30, 60], repression: [32, 39], idealization: [34, 38],
-  isolation: [51, 56], helpRejectingComplaining: [48, 54], undoing: [49, 59], anticipation: [47, 53], affiliation: [52, 58],
-};
-
-export const dsq60 = fromKey("dsq60", "dsq60-ko-selfmap-v1", dsq60Texts, dsq60Key);

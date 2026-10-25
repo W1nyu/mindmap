@@ -9,6 +9,8 @@ export const agree5 = options(["전혀 아니다", "약간 아니다", "보통�
 export const frequency5 = options(["거의 없다 (0–10%)", "가끔 (11–35%)", "절반 정도 (36–65%)", "대부분 (66–90%)", "거의 항상 (91–100%)"]);
 /** ECR-R·ECR-RS: Strongly disagree – Strongly agree (7점) */
 export const agree7 = options(["전혀 아니다", "아니다", "약간 아니다", "보통이다", "약간 그렇다", "그렇다", "매우 그렇다"]);
+/** DMRS-SR-30: Not at all (0) – Very often/much (4) (5점) */
+export const frequency5dmrs = options(["전혀 아니다", "드물게·약간", "가끔·어느 정도", "자주·많이", "매우 자주·매우 많이"]);
 /** DSQ: 1 strongly disagree · 5 neither · 9 strongly agree (9점) */
 export const agree9 = options(["전혀 동의 안 함", "동의 안 함", "대체로 동의 안 함", "약간 동의 안 함", "중간", "약간 동의", "대체로 동의", "동의", "매우 동의"]);
 
@@ -17,6 +19,8 @@ export function buildInstrument<S extends string>(spec: {
   id: string;
   version: string;
   options: readonly LikertOption[];
+  /** 원 척도의 첫 번호. 기본 1 */
+  origin?: number;
   scaleIds: readonly S[];
   items: readonly (readonly [text: string, scale: S, reverse?: boolean])[];
 }): LikertInstrument<S> {
@@ -25,6 +29,7 @@ export function buildInstrument<S extends string>(spec: {
     version: spec.version,
     points: spec.options.length,
     options: spec.options,
+    origin: spec.origin ?? 1,
     scaleIds: spec.scaleIds,
     items: spec.items.map(([text, scale, reverse], index) => ({ id: `${spec.id}-${index + 1}`, kind: "likert", text, scale, reverse: Boolean(reverse), weight: 1 })),
   };

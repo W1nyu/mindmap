@@ -84,7 +84,7 @@ export function ProfileMap({ results, example = false, compact = false }: { resu
   const selectedGroup = selected ? groups.find((group) => group.module === selected.module)! : null;
   const pendingGroups = groups.filter((group) => !group.done);
 
-  const wheel = <svg className="pw-svg" viewBox={`0 0 ${SIZE} ${SIZE}`} role="img" aria-label={done.map((row) => `${row.label} ${row.mean.toFixed(1)}/${row.points}`).join(", ") || "아직 마친 검사가 없어요"} onMouseLeave={() => setHover({})}>
+  const wheel = <svg className="pw-svg" viewBox={`0 0 ${SIZE} ${SIZE}`} role="img" aria-label={done.map((row) => `${row.label} ${row.mean.toFixed(1)}/${row.max}`).join(", ") || "아직 마친 검사가 없어요"} onMouseLeave={() => setHover({})}>
     {[0.5, 1].map((ratio) => <circle key={ratio} cx={C} cy={C} r={R_IN + (R_OUT - R_IN) * ratio} className={`pw-ring ${ratio === 0.5 ? "mid" : ""}`} />)}
     {slices.map((slice, index) => {
       const row = slice.row;
@@ -94,7 +94,7 @@ export function ProfileMap({ results, example = false, compact = false }: { resu
       const label = labelPosition(slice.mid);
       const reference = row.reference === undefined ? null : R_IN + (R_OUT - R_IN) * (row.reference / 100);
       return <g key={row.id} className={`pw-slice ${moduleClass} ${rowOn(row.id) ? "" : "dim"} ${row.id === activeRow ? "on" : ""}`}
-        tabIndex={0} role="button" aria-label={`${row.label} 평균 ${row.mean.toFixed(1)} / ${row.points}`} aria-pressed={pinned === row.id}
+        tabIndex={0} role="button" aria-label={`${row.label} 평균 ${row.mean.toFixed(1)} / ${row.max}`} aria-pressed={pinned === row.id}
         onMouseEnter={() => setHover({ row: row.id })} onFocus={() => setHover({ row: row.id })} onBlur={() => setHover({})}
         onClick={() => setPinned((current) => (current === row.id ? "" : row.id))}>
         <path d={sector(R_IN, R_OUT, slice.a0, slice.a1)} className="pw-track" />
@@ -134,7 +134,7 @@ export function ProfileMap({ results, example = false, compact = false }: { resu
         {selected && selectedGroup ? <>
           <span className={`pw-panel-module module-${selected.module}`}><i aria-hidden="true" />{selectedGroup.title}</span>
           <h3>{selected.label}</h3>
-          <p className="pw-panel-score"><strong>{selected.mean.toFixed(1)}</strong> / {selected.points} <small>· 0–100 점수 {selected.score}</small></p>
+          <p className="pw-panel-score"><strong>{selected.mean.toFixed(1)}</strong> / {selected.max} <small>· 0–100 점수 {selected.score}</small></p>
           <span className={`pw-panel-bar module-${selected.module}`} aria-hidden="true"><span style={{ width: `${selected.score}%` }} /></span>
           <p className="pw-panel-direction">{selectedGroup.direction}</p>
           {links.filter((link) => link.from === selected.id || link.to === selected.id).map((link, index) => <p key={index} className={`pw-panel-link ${link.kind}`}><b>{link.kind === "resource" ? "자원" : "살펴볼 흐름"}</b> {link.title}</p>)}

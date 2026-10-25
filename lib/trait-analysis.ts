@@ -48,6 +48,6 @@ function facetScores(instrument: LikertInstrument<TraitId>, result: InstrumentRe
   return traitFacets.map((facet) => {
     const values = facet.items.map((n) => scored.get(instrument.items[n - 1].id)!);
     const average = values.reduce((sum, value) => sum + value, 0) / values.length;
-    return { id: facet.id, domain: facet.domain, name: facet.name, mean: Math.round((average + 1) * 100) / 100, score: Math.round((average / max) * 100) };
+    return { id: facet.id, domain: facet.domain, name: facet.name, mean: Math.round((average + instrument.origin) * 100) / 100, score: Math.round((average / max) * 100) };
   });
 }

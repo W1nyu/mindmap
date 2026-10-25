@@ -24,12 +24,13 @@ test("attachment types split on the published ECR-R sample means", () => {
 });
 
 test("defense type follows the style with the highest DSQ mean", () => {
-  const brief = resultWith("defense", "brief", (scale) => (["sublimation", "humor", "anticipation", "suppression"].includes(scale) ? 8 : 2));
-  assert.equal(typeCard(brief).name, "성숙한 방어 우세");
-  const immature = resultWith("defense", "brief", (scale) => (["projection", "actingOut", "denial"].includes(scale) ? 8 : 0));
+  const deep = resultWith("defense", "deep", (scale) => (["sublimation", "humor", "anticipation", "suppression"].includes(scale) ? 8 : 2));
+  assert.equal(typeCard(deep).name, "성숙한 방어 우세");
+  const immature = resultWith("defense", "deep", (scale) => (["projection", "actingOut", "denial"].includes(scale) ? 8 : 0));
   assert.equal(typeCard(immature).name, "미성숙한 방어 우세");
-  const deep = resultWith("defense", "deep", (scale) => (["intellectualization", "isolation", "undoing"].includes(scale) ? 8 : 1));
-  assert.equal(typeCard(deep).name, "신경증적 방어 우세");
+  const brief = resultWith("defense", "brief", (scale) => (["intellectualization", "isolation", "undoing"].includes(scale) ? 4 : 1));
+  assert.equal(typeCard(brief).name, "신경증적 방어 우세");
+  assert.match(typeCard(brief).basis, /ODF/);
 });
 
 test("emotion type is calm when every DERS area is low, otherwise named after the highest area", () => {

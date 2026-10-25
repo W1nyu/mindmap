@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { ecrR, ecrRS } from "../data/attachment";
-import { dsq40, dsq40Tiers, dsq60 } from "../data/defense-dsq";
+import { dmrsSr30 } from "../data/defense-dmrs";
+import { dsq40, dsq40Tiers } from "../data/defense-dsq";
 import { defenseMeta } from "../data/defense-mechanisms";
 import { ders18, ders36 } from "../data/emotion";
 import { assessmentModules, formIds, moduleIds } from "../data/modules";
@@ -15,14 +16,18 @@ const itemAt = (instrument: LikertInstrument, number: number) => instrument.item
 const reversed = (instrument: LikertInstrument) => instrument.items.flatMap((item, index) => (item.reverse ? [index + 1] : []));
 
 test("every module has a valid brief and deep form with the original response format", () => {
-  const expected = { emotion: [18, 36, 5], defense: [40, 60, 9], traits: [30, 60, 5], attachment: [9, 36, 7] } as const;
+  const expected = { emotion: [18, 36, 5], defense: [30, 40, 0], traits: [30, 60, 5], attachment: [9, 36, 7] } as const;
   for (const id of moduleIds) {
     for (const form of formIds) validateInstrument(assessmentModules[id].forms[form].instrument);
     const [brief, deep, points] = expected[id];
     assert.equal(assessmentModules[id].forms.brief.instrument.items.length, brief, id);
     assert.equal(assessmentModules[id].forms.deep.instrument.items.length, deep, id);
-    assert.equal(assessmentModules[id].forms.brief.instrument.points, points);
-    assert.equal(assessmentModules[id].forms.deep.instrument.points, points);
+    if (id === "defense") {
+      assert.deepEqual([assessmentModules[id].forms.brief.instrument.points, assessmentModules[id].forms.deep.instrument.points], [5, 9]);
+    } else {
+      assert.equal(assessmentModules[id].forms.brief.instrument.points, points);
+      assert.equal(assessmentModules[id].forms.deep.instrument.points, points);
+    }
     assert.notEqual(assessmentModules[id].forms.brief.storageKey, assessmentModules[id].forms.deep.storageKey);
   }
 });
@@ -38,20 +43,29 @@ test("DERS-36 and DERS-18 follow the published subscale keys", () => {
   assert.deepEqual([10, 11, 17].map((n) => itemAt(ders18, n).scale), ["strategies", "strategies", "strategies"]);
 });
 
-test("DSQ-40 and DSQ-60 score every defense from exactly two items with no reverse keying", () => {
-  for (const instrument of [dsq40, dsq60]) {
-    assert.ok(instrument.items.every((item) => !item.reverse));
-    for (const id of instrument.scaleIds) assert.equal(count(instrument, id), 2, `${instrument.id} ${id}`);
-  }
+test("DSQ-40 scores every defense from exactly two items with no reverse keying", () => {
+  assert.ok(dsq40.items.every((item) => !item.reverse));
+  for (const id of dsq40.scaleIds) assert.equal(count(dsq40, id), 2, id);
   assert.equal(dsq40.scaleIds.length, 20);
-  assert.equal(dsq60.scaleIds.length, 30);
   assert.equal(itemAt(dsq40, 13).scale, "devaluation");
   assert.equal(itemAt(dsq40, 33).scale, "displacement");
-  assert.equal(itemAt(dsq60, 60).scale, "displacement");
-  assert.equal(itemAt(dsq60, 16).scale, "omnipotence");
   const tiers = Object.values(dsq40Tiers);
   assert.deepEqual(["adaptive", "inhibitory", "immediate"].map((tier) => tiers.filter((value) => value === tier).length), [4, 4, 12]);
-  for (const id of [...dsq40.scaleIds, ...dsq60.scaleIds]) assert.ok(defenseMeta(id), id);
+  for (const id of dsq40.scaleIds) assert.ok(defenseMeta(id), id);
+});
+
+test("DMRS-SR-30 covers 28 defenses with the item counts per DMRS level reported in Di Giuseppe et al. (2020), Table 2", () => {
+  assert.equal(dmrsSr30.items.length, 30);
+  assert.equal(dmrsSr30.scaleIds.length, 28);
+  assert.equal(dmrsSr30.points, 5);
+  assert.ok(dmrsSr30.items.every((item) => !item.reverse));
+  for (const id of dmrsSr30.scaleIds) assert.equal(count(dmrsSr30, id), id === "passiveAggression" || id === "dissociation" ? 2 : 1, id);
+  const perLevel = [7, 6, 5, 4, 3, 2, 1].map((level) => dmrsSr30.items.filter((item) => defenseMeta(item.scale).level === level).length);
+  assert.deepEqual(perLevel, [8, 3, 5, 3, 4, 3, 4]);
+  const perCategory = [[7], [5, 6], [1, 2, 3, 4]].map((levels) => dmrsSr30.items.filter((item) => levels.includes(defenseMeta(item.scale).level)).length);
+  assert.deepEqual(perCategory, [8, 8, 14]);
+  const depressive = dmrsSr30.items.filter((item) => [1, 2].includes(defenseMeta(item.scale).level) || ["projection", "devaluation"].includes(item.scale)).length;
+  assert.equal(depressive, 9);
 });
 
 test("BFI-2 and BFI-2-S follow the published domain and facet keys", () => {

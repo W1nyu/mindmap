@@ -19,7 +19,7 @@ export function isLikertValue(value: unknown, points: number): value is number {
 export function validateInstrument(instrument: LikertInstrument): void {
   if (!instrument || typeof instrument.id !== "string" || !instrument.id.trim() ||
     typeof instrument.version !== "string" || !instrument.version.trim() ||
-    !Number.isInteger(instrument.points) || instrument.points < 2 ||
+    !Number.isInteger(instrument.points) || instrument.points < 2 || !Number.isInteger(instrument.origin) ||
     !Array.isArray(instrument.options) || instrument.options.length !== instrument.points ||
     instrument.options.some((option, index) => option.value !== index || !option.label) ||
     !Array.isArray(instrument.scaleIds) || instrument.scaleIds.length === 0 ||
@@ -45,7 +45,7 @@ export function validateInstrument(instrument: LikertInstrument): void {
 
 /**
  * 순수 함수: 역채점(최댓값 − 응답) → 척도별 가중 평균 → 0–100 정규화.
- * 원 척도 단위의 평균(1–points)도 함께 돌려줍니다. 미응답은 0으로 대체하지 않습니다.
+ * 원 척도 단위의 평균(origin부터)도 함께 돌려줍니다. 미응답은 0으로 대체하지 않습니다.
  */
 export function scoreLikertInstrument<S extends string>(
   instrument: LikertInstrument<S>,
@@ -90,10 +90,10 @@ export function scoreLikertInstrument<S extends string>(
       throw new ScoringError("INVALID_QUESTIONNAIRE", "가중치 합이 계산 범위를 벗어났습니다.");
     }
     const average = weightedSum / weightSum;
-    return { scale, score: Math.round((average / max) * 100), mean: Math.round((average + 1) * 100) / 100, weightedSum, weightSum, evidence };
+    return { scale, score: Math.round((average / max) * 100), mean: Math.round((average + instrument.origin) * 100) / 100, weightedSum, weightSum, evidence };
   });
   return {
     source: "computed", instrumentId: instrument.id, instrumentVersion: instrument.version,
-    scoringVersion, points: instrument.points, responseCount: responses.length, scales,
+    scoringVersion, points: instrument.points, origin: instrument.origin, responseCount: responses.length, scales,
   };
 }

@@ -25,7 +25,7 @@ export function computeModuleResult(module: ModuleId, form: FormId, responses: r
     case "emotion": return { module, form, profile: analyzeEmotion(responses, instrument as LikertInstrument<EmotionId>) };
     case "defense": {
       const defenses = instrument as LikertInstrument<DefenseId>;
-      return { module, form, profile: analyzeDefenses(responses, defenses, form === "brief" ? dsq40Tiers : tiersFromLevels(defenses.scaleIds)) };
+      return { module, form, profile: analyzeDefenses(responses, defenses, form === "deep" ? dsq40Tiers : tiersFromLevels(defenses.scaleIds)) };
     }
     case "traits": return { module, form, profile: analyzeTraits(responses, instrument as LikertInstrument<TraitId>) };
     case "attachment": return { module, form, profile: analyzeAttachment(responses, instrument as LikertInstrument<AttachmentId>) };
@@ -45,7 +45,7 @@ const exampleTargets: Record<ModuleId, Record<string, number>> = {
 
 export function exampleResponses(module: ModuleId, form: FormId = "brief"): LikertResponse[] {
   const instrument = assessmentModules[module].forms[form].instrument;
-  const tiers = form === "brief" ? dsq40Tiers : tiersFromLevels(instrument.scaleIds as readonly DefenseId[]);
+  const tiers = module !== "defense" ? {} : form === "deep" ? dsq40Tiers : tiersFromLevels(instrument.scaleIds as readonly DefenseId[]);
   const max = instrument.points - 1;
   let seed = 7;
   return instrument.items.map((item) => {

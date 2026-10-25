@@ -1,6 +1,7 @@
 import { attachmentMeta, ecrR, ecrRS } from "./attachment";
 import { defenseMechanisms } from "./defense-mechanisms";
-import { dsq40, dsq60 } from "./defense-dsq";
+import { dmrsSr30 } from "./defense-dmrs";
+import { dsq40 } from "./defense-dsq";
 import { ders18, ders36, emotionMeta } from "./emotion";
 import { bfi2, bfi2S, traitMeta } from "./traits";
 import type { LikertInstrument, ScaleMeta } from "../types/assessment";
@@ -60,8 +61,8 @@ export const assessmentModules: Record<ModuleId, AssessmentModule> = {
     showScaleLabel: false,
     questionHint: "각 문장에 얼마나 동의하는지 1(전혀 동의 안 함)부터 9(매우 동의)까지 골라 주세요. 정답은 없어요.",
     forms: {
-      brief: form("defense", "brief", "DSQ-40", dsq40, 7, "Andrews, Singh & Bond (1993)"),
-      deep: form("defense", "deep", "DSQ-60", dsq60, 10, "Thygesen et al. (2008)"),
+      brief: form("defense", "brief", "DMRS-SR-30", dmrsSr30, 5, "Di Giuseppe, Perry et al. (2020)", "지난 일주일 동안 어려운 감정이나 상황을 이런 방식으로 얼마나 다뤘는지 골라 주세요."),
+      deep: form("defense", "deep", "DSQ-40", dsq40, 7, "Andrews, Singh & Bond (1993)", "평소의 나를 떠올리며 각 문장에 얼마나 동의하는지 1(전혀 동의 안 함)부터 9(매우 동의)까지 골라 주세요."),
     },
   },
   traits: {

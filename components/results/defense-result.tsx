@@ -16,7 +16,7 @@ function Highlights({ profile }: { profile: DefenseProfile }) {
       return <article key={item.defense} className={`highlight-card tier-${item.tier}`}>
         <div className="highlight-top"><span className="tier-pill"><i aria-hidden="true" />{tierMeta(item.tier).name}</span><span className="highlight-rank">{index + 1}{item.closeToPrevious ? " · 비슷한 수준" : ""}</span></div>
         <h3>{meta.name} <small>{meta.englishName}</small></h3>
-        <p className="highlight-score"><strong>{item.mean.toFixed(1)}</strong> / 9 · {bandLabels[scoreBand(item.score)]}</p>
+        <p className="highlight-score"><strong>{item.mean.toFixed(1)}</strong> / {profile.result.origin + profile.result.points - 1} · {bandLabels[scoreBand(item.score)]}</p>
         <p className="highlight-summary">{meta.summary}</p>
         <dl className="highlight-details">
           <div><dt>지켜 주는 것</dt><dd>{meta.protects}</dd></div>

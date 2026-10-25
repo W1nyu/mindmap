@@ -75,10 +75,10 @@ export function Questionnaire({ moduleId, form }: { moduleId: ModuleId; form: Fo
       if (reviewing || confirmReset || event.altKey || event.ctrlKey || event.metaKey) return;
       const target = event.target as HTMLElement | null;
       if (target && (target.tagName === "TEXTAREA" || target.tagName === "BUTTON" || target.tagName === "A" || (target.tagName === "INPUT" && (target as HTMLInputElement).type !== "radio"))) return;
-      const digit = Number(event.key);
-      if (/^[1-9]$/.test(event.key) && digit <= instrument.points) {
+      const value = Number(event.key) - instrument.origin;
+      if (/^[0-9]$/.test(event.key) && value >= 0 && value < instrument.points) {
         event.preventDefault();
-        answer(digit - 1);
+        answer(value);
       } else if (event.key === "Enter" && selected !== undefined) {
         event.preventDefault();
         next();
@@ -93,7 +93,7 @@ export function Questionnaire({ moduleId, form }: { moduleId: ModuleId; form: Fo
 
   if (!state.ready) return <p className="quiet-note" role="status">저장된 응답을 확인하고 있어요.</p>;
   const category = assessment.showScaleLabel ? assessment.scales.find((scale) => scale.id === question.scale)?.name : assessment.title;
-  const display = (value: number | undefined) => (value === undefined ? "—" : String(value + 1));
+  const display = (value: number | undefined) => (value === undefined ? "—" : String(value + instrument.origin));
 
   return <>
     {!state.storageAvailable && <p className="form-message" role="status">브라우저 저장 기능을 쓸 수 없어 새로고침하면 응답이 사라져요.</p>}
@@ -110,9 +110,9 @@ export function Questionnaire({ moduleId, form }: { moduleId: ModuleId; form: Fo
         {items.length >= 30 && answeredCount >= Math.floor(items.length / 2) && answeredCount < Math.floor(items.length / 2) + 3 && <p className="halfway-note" role="status"><Icon name="leaf" size={15} /> 절반을 지났어요. 응답은 저장돼 있으니 쉬었다 이어가도 괜찮아요.</p>}
         <h2 ref={headingRef} tabIndex={-1} id="question-label">{question.text}</h2>
         <p className="question-hint" id="question-hint">{hint ?? assessment.questionHint}</p>
-        <div aria-labelledby="question-label"><LikertInput key={question.id} questionId={question.id} options={instrument.options} value={selected} onChange={answer} /></div>
+        <div aria-labelledby="question-label"><LikertInput key={question.id} questionId={question.id} options={instrument.options} origin={instrument.origin} value={selected} onChange={answer} /></div>
         <div className="question-bottom"><button type="button" className="text-link" disabled={session.currentQuestionIndex === 0} onClick={() => goTo(session.currentQuestionIndex - 1)}>이전</button><button type="button" className="button button-primary" disabled={selected === undefined} onClick={next}>{isLast ? "응답 확인" : "다음"} <Icon name="arrow" size={17} /></button></div>
-        <p className="question-feedback" aria-live="polite"><span className="kbd-hint">키보드 <kbd>1</kbd>–<kbd>{instrument.points}</kbd>로 고르고 <kbd>Enter</kbd>로 넘어가요.</span></p>
+        <p className="question-feedback" aria-live="polite"><span className="kbd-hint">키보드 <kbd>{instrument.origin}</kbd>–<kbd>{instrument.origin + instrument.points - 1}</kbd>로 고르고 <kbd>Enter</kbd>로 넘어가요.</span></p>
       </>}
       {error && <p className="form-message" role="alert">{error}</p>}
     </div>

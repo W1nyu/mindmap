@@ -39,7 +39,7 @@ export interface DefenseProfile {
 
 const round2 = (value: number) => Math.round(value * 100) / 100;
 
-/** DSQ-60처럼 요인 키가 따로 없을 때는 DMRS 단계로 세 스타일을 나눕니다(7 성숙 · 5–6 신경증적 · 1–4 미성숙). */
+/** DMRS-SR-30처럼 DMRS 단계로 나뉘는 검사는 단계로 세 범주를 나눕니다(7 성숙 · 5–6 신경증적 · 1–4 미성숙; Di Giuseppe 외, 2020 표 1). */
 export function tiersFromLevels(ids: readonly DefenseId[]): DefenseTierMap {
   return Object.fromEntries(ids.map((id) => {
     const level = defenseMeta(id).level;

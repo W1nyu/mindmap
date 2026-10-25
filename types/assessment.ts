@@ -11,7 +11,7 @@ export interface LikertItem<S extends string = string> {
 }
 
 export interface LikertOption {
-  /** 0부터 시작하는 내부 값. 화면에는 value + 1을 보여줍니다. */
+  /** 0부터 시작하는 내부 값. 화면에는 value + origin을 보여줍니다. */
   value: LikertValue;
   label: string;
 }
@@ -23,6 +23,8 @@ export interface LikertInstrument<S extends string = string> {
   points: number;
   /** 선택지 이름. 길이는 points와 같습니다. */
   options: readonly LikertOption[];
+  /** 원 척도의 첫 번호(대부분 1, DMRS-SR-30은 0). 화면 표시와 평균 단위에만 씁니다. */
+  origin: number;
   scaleIds: readonly S[];
   items: readonly LikertItem<S>[];
 }
@@ -31,7 +33,7 @@ export interface ScaleScore<S extends string = string> {
   scale: S;
   /** 0–100으로 옮긴 점수 */
   score: number;
-  /** 원 척도 단위(1–points)의 문항 평균, 소수 둘째 자리 */
+  /** 원 척도 단위(origin부터)의 문항 평균, 소수 둘째 자리 */
   mean: number;
   weightedSum: number;
   weightSum: number;
@@ -44,6 +46,8 @@ export interface InstrumentResult<S extends string = string> {
   instrumentVersion: string;
   scoringVersion: string;
   points: number;
+  /** 원 척도의 첫 번호 */
+  origin: number;
   responseCount: number;
   scales: readonly ScaleScore<S>[];
 }
