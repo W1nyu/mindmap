@@ -1,12 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Hahmlet, IBM_Plex_Sans_KR } from "next/font/google";
+import { Black_Han_Sans, IBM_Plex_Sans_KR } from "next/font/google";
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/app-shell";
 import { ServiceWorker } from "@/components/service-worker";
 import "./globals.css";
+import "./atlas.css";
 
 // 빌드 시 내려받아 같은 출처에서 제공합니다(런타임 외부 요청 없음). 한글 글리프는 unicode-range 조각으로 필요한 만큼만 받습니다.
-const display = Hahmlet({ weight: ["500", "600", "700"], subsets: ["latin"], display: "swap", preload: false, variable: "--font-hahmlet" });
+const display = Black_Han_Sans({ weight: "400", subsets: ["latin"], display: "swap", preload: false, variable: "--font-display-face" });
 const body = IBM_Plex_Sans_KR({ weight: ["400", "500", "600", "700"], subsets: ["latin"], display: "swap", preload: false, variable: "--font-plex" });
 
 export const metadata: Metadata = {
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f7f6f2",
+  themeColor: "#e9edf2",
   viewportFit: "cover",
 };
 
