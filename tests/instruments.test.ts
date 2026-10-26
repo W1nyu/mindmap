@@ -4,7 +4,7 @@ import { ecrR, ecrRS } from "../data/attachment";
 import { dmrsSr30 } from "../data/defense-dmrs";
 import { dsq40, dsq40Tiers } from "../data/defense-dsq";
 import { defenseMeta } from "../data/defense-mechanisms";
-import { ders18, ders36 } from "../data/emotion";
+import { DERS18_SOURCE_ITEMS, ders18, ders36 } from "../data/emotion";
 import { assessmentModules, formIds, moduleIds } from "../data/modules";
 import { bfi2, bfi2S, traitFacets } from "../data/traits";
 import { validateInstrument } from "../lib/likert-engine";
@@ -41,6 +41,14 @@ test("DERS-36 and DERS-18 follow the published subscale keys", () => {
   assert.deepEqual(reversed(ders18), [1, 4, 6]);
   assert.deepEqual([7, 13, 14].map((n) => itemAt(ders18, n).scale), ["nonacceptance", "nonacceptance", "nonacceptance"]);
   assert.deepEqual([10, 11, 17].map((n) => itemAt(ders18, n).scale), ["strategies", "strategies", "strategies"]);
+  // 한국판 K-DERS(조용래, 2007) 문장과 응답 표기, DERS-18은 같은 원 문항을 그대로 씀
+  assert.equal(itemAt(ders36, 25).text, "나는 화가 나거나 기분이 나쁘면, 그렇게 느끼는 것에 대해 죄책감을 느낀다.");
+  assert.deepEqual(ders36.options.map((option) => option.label.split(" (")[0]), ["거의 그렇지 않다", "때때로 그렇다", "대략 반쯤 그렇다", "대부분 그렇다", "거의 언제나 그렇다"]);
+  DERS18_SOURCE_ITEMS.forEach((number, index) => {
+    const short = itemAt(ders18, index + 1);
+    const full = itemAt(ders36, number);
+    assert.deepEqual([short.text, short.scale, Boolean(short.reverse)], [full.text, full.scale, Boolean(full.reverse)], `DERS-18 ${index + 1} = DERS ${number}`);
+  });
 });
 
 test("DSQ-40 scores every defense from exactly two items with no reverse keying", () => {

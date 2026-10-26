@@ -47,10 +47,10 @@ export const assessmentModules: Record<ModuleId, AssessmentModule> = {
     tagline: "속상한 순간 정서를 다루는 방식(정서조절곤란)",
     scales: emotionMeta,
     showScaleLabel: false,
-    questionHint: "최근 몇 달 동안의 나를 떠올리며, 얼마나 자주 그런지 골라 주세요.",
+    questionHint: "각 문장이 평소 나에게 얼마나 자주 해당되는지 골라 주세요.",
     forms: {
-      brief: form("emotion", "brief", "DERS-18", ders18, 3, "Victor & Klonsky (2016) · 한국 단축형 검증 Kim et al. (2024)"),
-      deep: form("emotion", "deep", "DERS-36", ders36, 6, "Gratz & Roemer (2004)"),
+      brief: form("emotion", "brief", "DERS-18", ders18, 3, "Victor & Klonsky (2016) · 한국판 문항 조용래 (2007) · 한국 단축형 검증 Kim et al. (2024)"),
+      deep: form("emotion", "deep", "DERS-36", ders36, 6, "Gratz & Roemer (2004) · 한국판 문항 조용래 (2007)"),
     },
   },
   defense: {

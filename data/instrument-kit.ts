@@ -5,8 +5,8 @@ const options = (labels: readonly string[]): LikertOption[] => labels.map((label
 
 /** BFI-2: Disagree strongly – Agree strongly (5점) */
 export const agree5 = options(["전혀 아니다", "약간 아니다", "보통이다", "약간 그렇다", "매우 그렇다"]);
-/** DERS: almost never (0–10%) – almost always (91–100%) (5점) */
-export const frequency5 = options(["거의 없다 (0–10%)", "가끔 (11–35%)", "절반 정도 (36–65%)", "대부분 (66–90%)", "거의 항상 (91–100%)"]);
+/** DERS: almost never (0–10%) – almost always (91–100%) (5점). 표기는 K-DERS(조용래, 2007) */
+export const frequency5 = options(["거의 그렇지 않다 (0–10%)", "때때로 그렇다 (11–35%)", "대략 반쯤 그렇다 (36–65%)", "대부분 그렇다 (66–90%)", "거의 언제나 그렇다 (91–100%)"]);
 /** ECR-R·ECR-RS: Strongly disagree – Strongly agree (7점) */
 export const agree7 = options(["전혀 아니다", "아니다", "약간 아니다", "보통이다", "약간 그렇다", "그렇다", "매우 그렇다"]);
 /** DMRS-SR-30: Not at all (0) – Very often/much (4) (5점) */

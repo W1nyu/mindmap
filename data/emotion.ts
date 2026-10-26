@@ -5,7 +5,7 @@ import { buildInstrument, frequency5 } from "./instrument-kit";
  * 정서조절곤란 척도(DERS; Gratz & Roemer, 2004)와 단축형 DERS-18(Victor & Klonsky, 2016).
  * 하위척도 이름은 한국판 K-DERS(조용래, 2007)의 표기를 따릅니다.
  * 두 판 모두 같은 여섯 하위척도를 재며, 점수가 높을수록 그 영역의 조절이 어렵다는 뜻입니다.
- * DERS는 비용 없이 쓸 수 있는 공개 척도입니다. 문장은 SelfMap이 옮긴 한국어로, 공식 한국어판과 다를 수 있습니다.
+ * DERS는 비용 없이 쓸 수 있는 공개 척도입니다. 문장은 한국판 K-DERS(조용래, 2007, 한국심리학회지: 임상 26(4)) 부록 1을 따릅니다.
  */
 export const emotionIds = ["nonacceptance", "goals", "impulse", "awareness", "strategies", "clarity"] as const;
 export type EmotionId = (typeof emotionIds)[number];
@@ -33,70 +33,61 @@ export const emotionMeta: readonly EmotionMeta[] = [
     strength: "지금 느끼는 감정이 무엇인지 비교적 분명히 아는 편이에요.", difficulty: "느끼는 감정이 무엇인지 이름 붙이기 어려울 때가 많을 수 있어요." },
 ];
 
-/** DERS-36: 원 문항 번호 순서. R은 역채점. */
+/**
+ * DERS-36 문항(원 번호 순서). 문장은 한국판 K-DERS(조용래, 2007) 부록 1,
+ * 하위척도와 역채점(1, 2, 6, 7, 8, 10, 17, 20, 22, 24, 34)은 원판 Gratz & Roemer(2004) 키입니다.
+ */
+const dersItems: readonly (readonly [string, EmotionId, boolean?])[] = [
+  ["나는 내 감정에 대해 분명하게 알고 있다.", "clarity", true],
+  ["내가 어떻게 느끼는지에 주의를 기울인다.", "awareness", true],
+  ["나는 감정에 압도되고 감정을 통제하기 힘들다고 여긴다.", "impulse"],
+  ["내가 어떻게 느끼고 있는지를 알지 못한다.", "clarity"],
+  ["내 감정을 이해하기 어렵다.", "clarity"],
+  ["나는 내 감정에 주의를 기울인다.", "awareness", true],
+  ["내가 어떻게 느끼고 있는지를 정확하게 안다.", "clarity", true],
+  ["내가 느끼고 있는 것에 관심이 있다.", "awareness", true],
+  ["내가 느끼는 감정(방식)에 대해 혼란스럽다.", "clarity"],
+  ["나는 화가 나거나 기분이 나쁠 때, 내 감정을 알아차린다.", "awareness", true],
+  ["나는 화가 나거나 기분이 나쁘면, 그렇게 느끼는 나 자신에게 화가 난다.", "nonacceptance"],
+  ["나는 화가 나거나 기분이 나쁘면, 그렇게 느끼는 것에 대해 당황하게 된다.", "nonacceptance"],
+  ["나는 화가 나거나 기분이 나쁘면, 일을 끝마치기가 어렵다.", "goals"],
+  ["나는 화가 나거나 기분이 나쁘면, 자제하지 못한다.", "impulse"],
+  ["나는 화가 나거나 기분이 나쁘면, 오랫동안 내가 그런 상태로 있을 것이라고 믿는다.", "strategies"],
+  ["나는 화가 나거나 기분이 나쁘면, 결국에는 내가 아주 우울하게 느낄 것이라고 믿는다.", "strategies"],
+  ["나는 화가 나거나 기분이 나쁘면, 내 감정이 타당하고 중요하다고 믿는다.", "awareness", true],
+  ["나는 화가 나거나 기분이 나쁘면, 다른 일들에 집중하기가 어렵다.", "goals"],
+  ["나는 화가 나거나 기분이 나쁘면, 자제하지 못한다고 느낀다.", "impulse"],
+  ["나는 화가 나거나 기분이 나쁘더라도, 여전히 일은 끝마칠 수 있다.", "goals", true],
+  ["나는 화가 나거나 기분이 나쁘면, 그렇게 느끼는 것에 대해 부끄럽게 느낀다.", "nonacceptance"],
+  ["나는 화가 나거나 기분이 나쁘면, 궁극적으로 기분이 더 좋아지는 방법을 내가 찾아낼 수 있다고 믿는다.", "strategies", true],
+  ["나는 화가 나거나 기분이 나쁘면, 내가 나약한 사람처럼 느껴진다.", "nonacceptance"],
+  ["나는 화가 나거나 기분이 나쁘더라도, 내 행동을 통제할 수 있는 것처럼 느껴진다.", "impulse", true],
+  ["나는 화가 나거나 기분이 나쁘면, 그렇게 느끼는 것에 대해 죄책감을 느낀다.", "nonacceptance"],
+  ["나는 화가 나거나 기분이 나쁘면, 집중하기가 어렵다.", "goals"],
+  ["나는 화가 나거나 기분이 나쁘면, 내 행동을 통제하기가 어렵다.", "impulse"],
+  ["나는 화가 나거나 기분이 나쁘면, 내 기분을 더 좋아지게 하기 위하여 내가 할 수 있는 일이 아무것도 없다고 믿는다.", "strategies"],
+  ["나는 화가 나거나 기분이 나쁘면, 그렇게 느끼는 나 자신에게 짜증이 난다.", "nonacceptance"],
+  ["나는 화가 나거나 기분이 나쁘면, 나 자신에 대해 기분이 매우 나빠지기 시작한다.", "strategies"],
+  ["나는 화가 나거나 기분이 나쁘면, 그 상태에 빠져 허우적거리는 것이 내가 할 수 있는 모든 것이라고 믿는다.", "strategies"],
+  ["나는 화가 나거나 기분이 나쁘면, 내 행동에 대한 통제력을 잃어버린다.", "impulse"],
+  ["나는 화가 나거나 기분이 나쁘면, 다른 어떤 일에 대해서도 생각하기가 어렵다.", "goals"],
+  ["나는 화가 나거나 기분이 나쁘면, 내가 진정으로 느끼고 있는 것이 무엇인지 신중하게 이해한다.", "awareness", true],
+  ["나는 화가 나거나 기분이 나쁘면, 내 기분이 더 좋아지는데 오랜 시간이 걸린다.", "strategies"],
+  ["나는 화가 나거나 기분이 나쁘면, 내 감정들에 의해 압도당하는 것처럼 느껴진다.", "strategies"],
+];
+
 export const ders36 = buildInstrument<EmotionId>({
-  id: "ders36", version: "ders36-ko-selfmap-v1", options: frequency5, scaleIds: emotionIds,
-  items: [
-    ["내 감정이 무엇인지 분명히 안다.", "clarity", true],
-    ["내 기분에 주의를 기울인다.", "awareness", true],
-    ["감정이 압도적이고 통제할 수 없게 느껴진다.", "impulse"],
-    ["내가 어떤 기분인지 전혀 모르겠다.", "clarity"],
-    ["내 감정을 이해하기 어렵다.", "clarity"],
-    ["내 감정을 세심하게 살핀다.", "awareness", true],
-    ["내가 어떤 기분인지 정확히 안다.", "clarity", true],
-    ["내가 무엇을 느끼는지 중요하게 여긴다.", "awareness", true],
-    ["내 기분이 어떤지 헷갈린다.", "clarity"],
-    ["속상할 때, 내 감정을 인정한다.", "awareness", true],
-    ["속상할 때, 그렇게 느끼는 나 자신에게 화가 난다.", "nonacceptance"],
-    ["속상할 때, 그렇게 느끼는 것이 창피하다.", "nonacceptance"],
-    ["속상할 때, 일을 해내기 어렵다.", "goals"],
-    ["속상할 때, 통제력을 잃는다.", "impulse"],
-    ["속상할 때, 이 상태가 오래 갈 거라고 믿는다.", "strategies"],
-    ["속상할 때, 결국 몹시 우울해질 거라고 믿는다.", "strategies"],
-    ["속상할 때, 내 감정이 타당하고 중요하다고 믿는다.", "awareness", true],
-    ["속상할 때, 다른 일에 집중하기 어렵다.", "goals"],
-    ["속상할 때, 통제할 수 없다고 느낀다.", "impulse"],
-    ["속상할 때도, 해야 할 일은 해낼 수 있다.", "goals", true],
-    ["속상할 때, 그렇게 느끼는 내가 부끄럽다.", "nonacceptance"],
-    ["속상할 때, 결국 나아질 방법을 찾을 수 있다는 걸 안다.", "strategies", true],
-    ["속상할 때, 내가 약한 사람처럼 느껴진다.", "nonacceptance"],
-    ["속상할 때도, 내 행동을 통제할 수 있다고 느낀다.", "impulse", true],
-    ["속상할 때, 그렇게 느끼는 것에 죄책감이 든다.", "nonacceptance"],
-    ["속상할 때, 집중하기 어렵다.", "goals"],
-    ["속상할 때, 내 행동을 통제하기 어렵다.", "impulse"],
-    ["속상할 때, 기분을 나아지게 할 방법이 아무것도 없다고 믿는다.", "strategies"],
-    ["속상할 때, 그렇게 느끼는 나 자신에게 짜증이 난다.", "nonacceptance"],
-    ["속상할 때, 나 자신이 매우 못마땅하게 느껴지기 시작한다.", "strategies"],
-    ["속상할 때, 그 기분에 빠져 있는 것 말고는 할 수 있는 게 없다고 믿는다.", "strategies"],
-    ["속상할 때, 내 행동에 대한 통제력을 잃는다.", "impulse"],
-    ["속상할 때, 다른 것은 생각하기 어렵다.", "goals"],
-    ["속상할 때, 내가 정말 무엇을 느끼는지 시간을 들여 알아본다.", "awareness", true],
-    ["속상할 때, 기분이 나아지기까지 오래 걸린다.", "strategies"],
-    ["속상할 때, 감정이 감당하기 벅차게 느껴진다.", "strategies"],
-  ],
+  id: "ders36", version: "ders36-kders-v1", options: frequency5, scaleIds: emotionIds,
+  items: dersItems.map(([text, scale, reverse]) => [text, scale, reverse]),
 });
 
-/** DERS-18: Victor & Klonsky(2016) 원 문항 번호 순서. 정서 자각 세 문항은 역채점. */
+/** DERS-18(Victor & Klonsky, 2016)에 남은 원 문항 번호. 같은 K-DERS 문장을 씁니다. */
+export const DERS18_SOURCE_ITEMS = [2, 4, 5, 6, 9, 10, 12, 13, 14, 15, 16, 18, 21, 25, 26, 27, 31, 32] as const;
+
 export const ders18 = buildInstrument<EmotionId>({
-  id: "ders18", version: "ders18-ko-selfmap-v1", options: frequency5, scaleIds: emotionIds,
-  items: [
-    ["내 기분에 주의를 기울인다.", "awareness", true],
-    ["내가 어떤 기분인지 전혀 모르겠다.", "clarity"],
-    ["내 감정을 이해하기 어렵다.", "clarity"],
-    ["내 감정을 세심하게 살핀다.", "awareness", true],
-    ["내 기분이 어떤지 헷갈린다.", "clarity"],
-    ["속상할 때, 내 감정을 인정한다.", "awareness", true],
-    ["속상할 때, 그렇게 느끼는 것이 창피하다.", "nonacceptance"],
-    ["속상할 때, 일을 해내기 어렵다.", "goals"],
-    ["속상할 때, 통제력을 잃는다.", "impulse"],
-    ["속상할 때, 이 상태가 오래 갈 거라고 믿는다.", "strategies"],
-    ["속상할 때, 결국 몹시 우울해질 거라고 믿는다.", "strategies"],
-    ["속상할 때, 다른 일에 집중하기 어렵다.", "goals"],
-    ["속상할 때, 그렇게 느끼는 내가 부끄럽다.", "nonacceptance"],
-    ["속상할 때, 그렇게 느끼는 것에 죄책감이 든다.", "nonacceptance"],
-    ["속상할 때, 집중하기 어렵다.", "goals"],
-    ["속상할 때, 내 행동을 통제하기 어렵다.", "impulse"],
-    ["속상할 때, 그 기분에 빠져 있는 것 말고는 할 수 있는 게 없다고 믿는다.", "strategies"],
-    ["속상할 때, 내 행동에 대한 통제력을 잃는다.", "impulse"],
-  ],
+  id: "ders18", version: "ders18-kders-v1", options: frequency5, scaleIds: emotionIds,
+  items: DERS18_SOURCE_ITEMS.map((number) => {
+    const [text, scale, reverse] = dersItems[number - 1];
+    return [text, scale, reverse];
+  }),
 });
