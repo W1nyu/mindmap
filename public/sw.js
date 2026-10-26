@@ -1,10 +1,10 @@
 /*
- * SelfMap 서비스 워커: 오프라인에서도 화면을 열 수 있게 합니다.
+ * mindmap 서비스 워커: 오프라인에서도 화면을 열 수 있게 합니다.
  * - 페이지 이동: 네트워크 우선, 실패하면 캐시(없으면 홈) → 온라인일 땐 항상 최신 화면
  * - /_next/static, 아이콘: 캐시 우선(파일 이름에 해시가 있어 바뀌지 않음)
  * - /api/ 요청과 다른 출처 요청은 건드리지 않습니다. 사용자 데이터는 캐시하지 않습니다.
  */
-const CACHE = "selfmap-v4";
+const CACHE = "mindmap-v5";
 const CORE = ["/", "/questions", "/results", "/check-in",
   "/questions/emotion", "/questions/defense", "/questions/traits", "/questions/attachment"];
 
@@ -14,7 +14,7 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(caches.keys()
-    .then((keys) => Promise.all(keys.filter((key) => key.startsWith("selfmap-") && key !== CACHE).map((key) => caches.delete(key))))
+    .then((keys) => Promise.all(keys.filter((key) => (key.startsWith("selfmap-") || key.startsWith("mindmap-")) && key !== CACHE).map((key) => caches.delete(key))))
     .then(() => self.clients.claim()));
 });
 

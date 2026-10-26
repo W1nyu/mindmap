@@ -10,12 +10,12 @@ const display = Hahmlet({ weight: ["500", "600", "700"], subsets: ["latin"], dis
 const body = IBM_Plex_Sans_KR({ weight: ["400", "500", "600", "700"], subsets: ["latin"], display: "swap", preload: false, variable: "--font-plex" });
 
 export const metadata: Metadata = {
-  title: { default: "SelfMap · 나를 이해하는 심리 지도", template: "%s · SelfMap" },
+  title: { default: "mindmap · 나를 이해하는 심리 지도", template: "%s · mindmap" },
   description: "정서조절, 방어기제, 성격 5요인, 성인 애착을 공인 심리 척도로 측정해 보여주는 자기이해 도구. 진단이 아닙니다.",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f5f4f8",
+  themeColor: "#f7f6f2",
   viewportFit: "cover",
 };
 

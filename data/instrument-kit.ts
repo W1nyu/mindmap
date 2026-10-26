@@ -1,6 +1,6 @@
 import type { LikertInstrument, LikertOption } from "../types/assessment";
 
-/** 원 척도의 선택지를 그대로 따릅니다. 이름은 SelfMap이 옮긴 한국어입니다. */
+/** 원 척도의 선택지를 그대로 따릅니다. 이름은 mindmap이 옮긴 한국어입니다. */
 const options = (labels: readonly string[]): LikertOption[] => labels.map((label, value) => ({ value, label }));
 
 /** BFI-2: Disagree strongly – Agree strongly (5점) */

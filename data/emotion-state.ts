@@ -5,7 +5,7 @@ import { buildInstrument } from "./instrument-kit";
  * 상태 정서조절곤란 척도(S-DERS; Lavender, Tull, DiLillo, Messman-Moore & Gratz, 2017, Assessment 24(2)).
  * DERS를 ‘지금 이 순간’의 상태로 옮긴 21문항이며, 반복 측정을 위해 만들어졌습니다.
  * 문항과 하위척도는 논문 표 2, 응답(1 전혀 아니다 – 5 완전히 그렇다)과 채점(하위척도 합, 정서 자각 문항 역채점)은 본문을 따릅니다.
- * 문항 순서는 개발 단계 28문항 중 남은 문항의 원 번호 순서입니다. 문장은 SelfMap이 옮긴 한국어입니다.
+ * 문항 순서는 개발 단계 28문항 중 남은 문항의 원 번호 순서입니다. 문장은 mindmap이 옮긴 한국어입니다.
  */
 export const stateEmotionIds = ["nonacceptance", "modulate", "awareness", "clarity"] as const;
 export type StateEmotionId = (typeof stateEmotionIds)[number];

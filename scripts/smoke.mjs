@@ -23,7 +23,7 @@ for (const path of missing) {
 }
 
 const manifest = await (await fetch(`${base}/manifest.webmanifest`)).json();
-check(manifest.short_name === "SelfMap" && manifest.icons?.length >= 2, "manifest incomplete");
+check(manifest.short_name === "mindmap" && manifest.icons?.length >= 2, "manifest incomplete");
 const sw = await fetch(`${base}/sw.js`);
 check(sw.status === 200 && /no-store/.test(sw.headers.get("cache-control") ?? ""), "sw.js must be served uncached");
 

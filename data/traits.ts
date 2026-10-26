@@ -5,7 +5,7 @@ import { traitIds, type TraitId, type TraitMeta } from "../types/traits";
  * 성격 5요인: Big Five Inventory–2(BFI-2; Soto & John, 2017). 한국판 타당화는 Choi 외(2025, Assessment).
  * 간편 검사는 BFI-2-S 30문항(Soto & John, 2017), 심층 검사는 BFI-2 60문항(15개 하위 측면 포함).
  * 영역 이름은 외향성·친화성·성실성·부정적 정서성·개방성입니다. 문항 순서와 채점 방향은 원 척도를 따르며,
- * 문장은 SelfMap이 원문을 옮긴 한국어입니다. 저작권은 John & Soto에게 있고 비상업적 연구 목적 사용이 허용됩니다.
+ * 문장은 mindmap이 원문을 옮긴 한국어입니다. 저작권은 John & Soto에게 있고 비상업적 연구 목적 사용이 허용됩니다.
  */
 export const traitMeta = [
   {

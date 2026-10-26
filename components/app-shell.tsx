@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { BrandMark } from "@/components/brand-mark";
 import { Icon } from "@/components/icon";
 import { isActivePath, mainNav } from "@/components/navigation";
 import { useModuleProgress } from "@/components/use-module-progress";
 
 function Brand() {
-  return <Link href="/" className="brand" aria-label="SelfMap 홈"><span className="brand-mark"><Icon name="mountain" size={19} /></span>SelfMap</Link>;
+  return <Link href="/" className="brand" aria-label="mindmap 홈"><BrandMark /><span className="brand-word">mind<span>map</span></span></Link>;
 }
 
 /** 지도 완성도: 네 모듈의 진행을 칸으로 보여줍니다. */
@@ -26,7 +27,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="app-shell">
       <a className="skip-link" href="#main-content">본문으로 이동</a>
       <aside className="sidebar" aria-label="사이드바">
-        <Brand />
+        <div className="brand-block"><Brand /><p className="brand-caption">나를 이해하는 심리 지도</p></div>
         <nav aria-label="주요 메뉴">
           {mainNav.map((item) => {
             const active = isActivePath(pathname, item.href);
@@ -40,7 +41,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <div className="main-shell">
         <main id="main-content" className="main-content">{children}</main>
-        <footer className="page-footer"><span>SelfMap은 자기이해 도구이며 진단을 제공하지 않습니다.</span></footer>
+        <footer className="page-footer"><span>mindmap은 자기이해 도구이며 진단을 제공하지 않습니다.</span></footer>
       </div>
 
       <nav className="bottom-nav" aria-label="아래 메뉴">

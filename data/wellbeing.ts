@@ -1,6 +1,6 @@
 /**
  * WHO-5 웰빙 지표(WHO-Five Well-Being Index, WHO 1998; Topp 외, 2015)의 구성을 따른 상태 체크입니다.
- * WHO-5는 허가 없이 무료로 쓸 수 있는 공개 척도이며, 아래 문장은 SelfMap이 옮긴 한국어 표현이라
+ * WHO-5는 허가 없이 무료로 쓸 수 있는 공개 척도이며, 아래 문장은 mindmap이 옮긴 한국어 표현이라
  * 공식 한국어판과 표현이 다를 수 있습니다. 성격 같은 ‘평소의 경향’이 아니라 ‘요즘의 상태’를 봅니다.
  */
 export const WELLBEING_VERSION = "who5-ko-selfmap-v1";

@@ -6,7 +6,7 @@ export type AttachmentId = (typeof attachmentIds)[number];
 /**
  * 성인 애착 두 차원(애착불안·애착회피, 한국판 ECR-R 김성현의 표기). 간편 검사는 ECR-RS 일반형 9문항(Fraley 외, 2011), 심층 검사는 ECR-R 36문항(Fraley, Waller & Brennan, 2000).
  * 두 척도 모두 7점 척도이며, 비상업적 연구 목적으로는 허가 없이 쓸 수 있도록 공개돼 있습니다.
- * 문장은 SelfMap이 옮긴 한국어입니다. ‘연인’이 없다면 가까운 관계를 떠올려 답해도 됩니다(저자가 대상 수정을 허용).
+ * 문장은 mindmap이 옮긴 한국어입니다. ‘연인’이 없다면 가까운 관계를 떠올려 답해도 됩니다(저자가 대상 수정을 허용).
  */
 export const attachmentMeta = [
   {

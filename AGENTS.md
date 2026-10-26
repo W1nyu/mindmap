@@ -1,7 +1,7 @@
-# SelfMap Project Rules
+# mindmap Project Rules
 
 ## Product
-SelfMap is a self-understanding tool, not a clinical diagnostic service.
+mindmap is a self-understanding tool, not a clinical diagnostic service.
 
 ## Psychology
 - Do not diagnose mental disorders.

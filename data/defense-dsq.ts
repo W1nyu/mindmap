@@ -6,7 +6,7 @@ import { agree9, buildInstrument } from "./instrument-kit";
  * 방어 스타일 질문지 DSQ-40(Andrews, Singh & Bond, 1993; 20개 방어 × 2문항). 9점 척도이며 역채점이 없습니다.
  * 방어 점수는 두 문항의 평균입니다. 평소의 방어 스타일을 묻는 심층 검사로 씁니다.
  * DSQ의 저작권은 개발자(Bond)에게 있으며 연구·교육 목적의 비상업적 사용을 전제로 합니다.
- * 문장은 SelfMap이 옮긴 한국어로, 공식 한국어판과 다를 수 있습니다.
+ * 문장은 mindmap이 옮긴 한국어로, 공식 한국어판과 다를 수 있습니다.
  */
 type Key = Partial<Record<DefenseId, readonly [number, number]>>;
 
