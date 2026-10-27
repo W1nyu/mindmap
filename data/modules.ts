@@ -59,10 +59,10 @@ export const assessmentModules: Record<ModuleId, AssessmentModule> = {
     tagline: "스트레스 앞에서 마음이 나를 지키는 방식",
     scales: defenseMechanisms.map((item) => ({ id: item.id, name: item.name, shortName: item.name, description: item.summary })),
     showScaleLabel: false,
-    questionHint: "각 문장에 얼마나 동의하는지 1(전혀 동의 안 함)부터 9(매우 동의)까지 골라 주세요. 정답은 없어요.",
+    questionHint: "각 문장이 나에게 얼마나 해당하는지 골라 주세요. 정답은 없어요.",
     forms: {
-      brief: form("defense", "brief", "DMRS-SR-30", dmrsSr30, 5, "Di Giuseppe, Perry et al. (2020)", "지난 일주일 동안 어려운 감정이나 상황을 이런 방식으로 얼마나 다뤘는지 골라 주세요."),
-      deep: form("defense", "deep", "DSQ-40", dsq40, 7, "Andrews, Singh & Bond (1993)", "평소의 나를 떠올리며 각 문장에 얼마나 동의하는지 1(전혀 동의 안 함)부터 9(매우 동의)까지 골라 주세요."),
+      brief: form("defense", "brief", "DMRS-SR-30", dmrsSr30, 5, "Di Giuseppe, Perry et al. (2020)", "지난 일주일 동안 힘든 일이나 감정이 있을 때 이런 적이 얼마나 있었는지 골라 주세요."),
+      deep: form("defense", "deep", "DSQ-40", dsq40, 7, "Andrews, Singh & Bond (1993)", "평소의 나를 떠올리며 각 문장이 얼마나 맞는지 1(전혀 아니다)부터 9(매우 그렇다)까지 골라 주세요."),
     },
   },
   traits: {

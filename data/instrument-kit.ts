@@ -10,9 +10,9 @@ export const frequency5 = options(["거의 그렇지 않다 (0–10%)", "때때�
 /** ECR-R·ECR-RS: Strongly disagree – Strongly agree (7점) */
 export const agree7 = options(["전혀 아니다", "아니다", "약간 아니다", "보통이다", "약간 그렇다", "그렇다", "매우 그렇다"]);
 /** DMRS-SR-30: Not at all (0) – Very often/much (4) (5점) */
-export const frequency5dmrs = options(["전혀 아니다", "드물게·약간", "가끔·어느 정도", "자주·많이", "매우 자주·매우 많이"]);
-/** DSQ: 1 strongly disagree · 5 neither · 9 strongly agree (9점) */
-export const agree9 = options(["전혀 동의 안 함", "동의 안 함", "대체로 동의 안 함", "약간 동의 안 함", "중간", "약간 동의", "대체로 동의", "동의", "매우 동의"]);
+export const frequency5dmrs = options(["전혀 없었다", "드물게 있었다", "가끔 있었다", "자주 있었다", "매우 자주 있었다"]);
+/** DSQ: 1 strongly disagree · 5 neither · 9 strongly agree (9점). 원 척도는 양 끝과 가운데만 이름이 있어 나머지는 mindmap이 붙인 표현입니다. */
+export const agree9 = options(["전혀 아니다", "거의 아니다", "아닌 편이다", "약간 아니다", "보통이다", "약간 그렇다", "그런 편이다", "꽤 그렇다", "매우 그렇다"]);
 
 /** [문항, 척도, 역채점] 목록에서 원 문항 번호 순서대로 도구를 만듭니다. 문항 ID는 `${id}-${번호}`입니다. */
 export function buildInstrument<S extends string>(spec: {
