@@ -3,17 +3,17 @@
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { Icon } from "@/components/icon";
+import { PageHero } from "@/components/page-hero";
 import { assessmentModules, formLabels, type FormId, type ModuleId } from "@/data/modules";
 import { moduleStores } from "@/lib/module-stores";
 import type { ResponseQuality } from "@/types/assessment";
 
 export function ResultEmptyState({ id, failed }: { id: ModuleId; failed: boolean }) {
   const assessment = assessmentModules[id];
-  return <div className="empty-state">
-    <h1 className="page-title">응답을 마치면 {assessment.title} 결과를 볼 수 있어요</h1>
-    <p className="page-description">{failed ? "저장된 응답을 확인하지 못했어요. 다시 응답해 주세요." : `간편 검사(${assessment.forms.brief.instrument.items.length}문항)만 마쳐도 결과가 열려요.`}</p>
-    <div className="hero-actions"><Link href={`/questions/${id}`} className="button button-primary">검사 시작 <Icon name="arrow" size={17} /></Link><Link href={`/results/${id}?example=1`} className="text-link">예시 보기</Link></div>
-  </div>;
+  return <PageHero title={`응답을 마치면 ${assessment.title} 결과를 볼 수 있어요`} className={`module-${id}`}
+    description={<p>{failed ? "저장된 응답을 확인하지 못했어요. 다시 응답해 주세요." : `간편 검사(${assessment.forms.brief.instrument.items.length}문항)만 마쳐도 결과가 열려요.`}</p>}>
+    <div className="hero-actions"><Link href={`/questions/${id}`} className="button button-bright">검사 시작하기</Link><Link href={`/results/${id}?example=1`} className="atlas-example">예시 결과 보기</Link></div>
+  </PageHero>;
 }
 
 export function QualityNote({ quality }: { quality: ResponseQuality }) {
@@ -28,7 +28,7 @@ export function QualityNote({ quality }: { quality: ResponseQuality }) {
 }
 
 /** 모듈 결과 화면의 공통 머리말·안내·삭제 동작입니다. */
-export function ResultFrame({ id, form, example, title, description, switcher, calculation, storageAvailable, children }: {
+export function ResultFrame({ id, form, example, title, description, switcher, calculation, storageAvailable, hero, children }: {
   id: ModuleId;
   form: FormId;
   example: boolean;
@@ -37,13 +37,18 @@ export function ResultFrame({ id, form, example, title, description, switcher, c
   description: string;
   calculation: ReactNode;
   storageAvailable: boolean;
+  /** 머리말 면 안에 함께 놓을 내용(유형 카드) */
+  hero?: ReactNode;
   children: ReactNode;
 }) {
   const [confirmReset, setConfirmReset] = useState(false);
   const assessment = assessmentModules[id];
   return <>
-    <Link href={`/results${example ? "?example=1" : ""}`} className="text-link back-link no-print"><Icon name="chevron" size={14} style={{ transform: "rotate(180deg)" }} /> 전체 결과</Link>
-    <div className="section-heading result-header"><div><h1 className="page-title">{title}</h1><p className="page-description">{description}</p>{switcher && <p className="form-switch">{switcher}</p>}</div>{example && <span className="example-badge">예시</span>}</div>
+    <PageHero title={title} className={`result-hero module-${id}`}
+      top={<div className="page-hero-top"><Link href={`/results${example ? "?example=1" : ""}`} className="hero-back no-print"><Icon name="chevron" size={14} style={{ transform: "rotate(180deg)" }} /> 전체 결과</Link>{example && <span className="example-badge">예시 응답</span>}</div>}
+      description={<><p>{description}</p>{switcher && <p className="form-switch">{switcher}</p>}</>}>
+      {hero}
+    </PageHero>
     {!example && !storageAvailable && <p className="form-message" role="status">저장 기능을 사용할 수 없어 새로고침하면 응답과 결과가 사라집니다.</p>}
     {children}
     <div className="calculation-note" id="calculation">{calculation}</div>

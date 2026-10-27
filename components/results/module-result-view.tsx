@@ -28,12 +28,12 @@ export function ModuleResultView({ id, example, form }: { id: ModuleId; example:
   const current = assessment.forms[result.form];
   const other = result.form === "brief" ? "deep" : "brief";
   const otherDone = !example && Boolean(states[other].session?.completed);
-  return <ResultFrame id={id} form={result.form} example={example} title={`${example ? "예시: " : ""}${assessment.title}`}
+  return <ResultFrame id={id} form={result.form} example={example} title={assessment.title}
     description={`${formLabels[result.form]} · ${current.name} (${current.citation}). ${descriptions[id]} 진단이 아닌 경향이에요.`}
     switcher={otherDone ? <Link className="text-link" href={`/results/${id}?form=${other}`}>{formLabels[other]} 결과 보기</Link>
       : !example ? <Link className="text-link" href={`/questions/${id}?form=${other}`}>{formLabels[other]}({assessment.forms[other].instrument.items.length}문항)도 해 보기</Link> : null}
-    calculation={<Calculation result={result} />} storageAvailable={states[result.form].storageAvailable}>
-    <TypeCardView card={typeCard(result)} large />
+    calculation={<Calculation result={result} />} storageAvailable={states[result.form].storageAvailable}
+    hero={<TypeCardView card={typeCard(result)} large />}>
     {result.module === "emotion" && <EmotionResult profile={result.profile} />}
     {result.module === "defense" && <DefenseResult profile={result.profile} />}
     {result.module === "traits" && <TraitResult profile={result.profile} />}
