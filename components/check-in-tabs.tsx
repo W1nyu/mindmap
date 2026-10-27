@@ -5,7 +5,7 @@ import { EmotionStateCheckApp } from "@/components/emotion-state/emotion-state-c
 import { WellbeingCheckApp } from "@/components/wellbeing/wellbeing-check";
 
 const tabs = [
-  { id: "wellbeing", label: "웰빙 (WHO-5)", text: "오늘이나 이번 주의 웰빙을 0–100으로 기록해요." },
+  { id: "wellbeing", label: "웰빙 (WHO-5)", text: "오늘 하루의 웰빙을 0–100으로 기록해요." },
   { id: "emotion", label: "정서조절 (S-DERS)", text: "지금 이 순간 감정을 얼마나 받아들이고 다룰 수 있는지 기록해요." },
 ] as const;
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ProfileMap } from "@/components/charts/profile-map";
 import { Icon } from "@/components/icon";
 import { moduleIds } from "@/data/modules";
+import { AdviceSection } from "./advice-section";
 import { BalanceSection } from "./balance-section";
 import { TypeCardDeck } from "./type-card";
 import { useAllModuleResults } from "./use-module-result";
@@ -21,6 +22,7 @@ export function ResultsOverview({ example }: { example: boolean }) {
         <ProfileMap results={results} example={example} />
       </section>
       <BalanceSection results={results} />
+      <AdviceSection results={results} />
     </>}
   </>;
 }

@@ -27,7 +27,7 @@ export interface BalanceSummary {
   care: readonly BalanceItem[];
 }
 
-const scaleName = (module: ModuleId, scale: string) => assessmentModules[module].scales.find((item) => item.id === scale)?.name
+export const scaleName = (module: ModuleId, scale: string) => assessmentModules[module].scales.find((item) => item.id === scale)?.name
   ?? { adaptive: "성숙한 방어", inhibitory: "신경증적 방어", immediate: "미성숙한 방어" }[scale] ?? scale;
 
 export function strengthsAndCare(results: ModuleResults): BalanceSummary {

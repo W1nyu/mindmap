@@ -8,21 +8,18 @@ import { ItemProfile, WellbeingGauge, WellbeingTrend } from "./wellbeing-charts"
 import { wellbeingStore } from "./wellbeing-store";
 
 const longDate = (date: Date) => date.toLocaleDateString("ko-KR", { month: "long", day: "numeric", weekday: "short" });
-const formPeriods = ["day", "week"] as const;
-
-function CheckForm({ initialPeriod, onDone, onCancel }: { initialPeriod: WellbeingPeriod; onDone: (check: WellbeingCheck) => void; onCancel: (() => void) | null }) {
-  const [period, setPeriod] = useState<WellbeingPeriod>(initialPeriod === "week" ? "week" : "day");
+/** 체크는 ‘오늘’ 하루 단위로만 받습니다. 이전에 저장된 이번 주·지난 2주 기록은 기록과 추이에서 그대로 보여요. */
+function CheckForm({ onDone, onCancel }: { onDone: (check: WellbeingCheck) => void; onCancel: (() => void) | null }) {
   const [answers, setAnswers] = useState<(WellbeingValue | null)[]>(() => wellbeingItems.map(() => null));
   const answered = answers.filter((value) => value !== null).length;
   const complete = answered === wellbeingItems.length;
   function submit(event: React.FormEvent) {
     event.preventDefault();
     if (!complete) return;
-    onDone(createCheck(answers as WellbeingValue[], new Date(), `w-${crypto.randomUUID()}`, period));
+    onDone(createCheck(answers as WellbeingValue[], new Date(), `w-${crypto.randomUUID()}`, "day"));
   }
   return <form className="viz-card wb-form" onSubmit={submit} aria-labelledby="wb-form-title">
-    <div className="wb-period" role="group" aria-label="체크 기간">{formPeriods.map((id) => <button key={id} type="button" aria-pressed={period === id} onClick={() => setPeriod(id)}>{wellbeingPeriods[id].label}</button>)}</div>
-    <div className="viz-heading"><div><h2 id="wb-form-title">{wellbeingPeriods[period].heading}</h2><p className="viz-caption" style={{ marginTop: 2 }}>얼마나 자주 그랬는지 골라 주세요.</p></div><span className="subtle-label">{answered} / {wellbeingItems.length}</span></div>
+    <div className="viz-heading"><div><h2 id="wb-form-title">{wellbeingPeriods.day.heading}</h2><p className="viz-caption" style={{ marginTop: 2 }}>오늘 하루 얼마나 자주 그랬는지 골라 주세요.</p></div><span className="subtle-label">{answered} / {wellbeingItems.length}</span></div>
     <ol className="wb-questions">
       {wellbeingItems.map((item, index) => <li key={item.id}>
         <fieldset>
@@ -40,7 +37,7 @@ function CheckForm({ initialPeriod, onDone, onCancel }: { initialPeriod: Wellbei
       <button type="submit" className="button button-primary" disabled={!complete}>{complete ? "체크 저장" : `${wellbeingItems.length - answered}문장 남았어요`}</button>
       {onCancel && <button type="button" className="text-link" onClick={onCancel}>취소</button>}
     </div>
-    <p className="viz-caption">같은 날 같은 기간으로 다시 체크하면 그날 기록이 새 응답으로 바뀌어요.</p>
+    <p className="viz-caption">하루에 한 번 기록해요. 오늘 다시 체크하면 오늘 기록이 새 응답으로 바뀌어요.</p>
   </form>;
 }
 
@@ -62,7 +59,7 @@ export function WellbeingCheckApp() {
   const latest = allPoints[allPoints.length - 1];
   const showForm = mode === "form" || (mode === "auto" && checks.length === 0);
   if (showForm) {
-    return <CheckForm initialPeriod={latest?.period ?? "day"} onCancel={checks.length > 0 ? () => go("result") : null} onDone={(check) => { wellbeingStore.set(addCheck(checks, check)); go("result"); }} />;
+    return <CheckForm onCancel={checks.length > 0 ? () => go("result") : null} onDone={(check) => { wellbeingStore.set(addCheck(checks, check)); go("result"); }} />;
   }
 
   const samePeriod = wellbeingTrend(checks, latest.period);
@@ -75,7 +72,7 @@ export function WellbeingCheckApp() {
   return <div className="result-stack">
     <div className="wb-actions">
       <button type="button" className="button button-primary" onClick={() => go("form")}><Icon name="pulse" size={17} /> 새로 체크하기</button>
-      <p className="viz-caption">매일 또는 매주 같은 때에 체크하면 변화가 잘 보여요.</p>
+      <p className="viz-caption">매일 비슷한 때에 오늘을 체크하면 변화가 잘 보여요.</p>
     </div>
     <div className="wb-top">
       <section className={`viz-card wb-score-card ${latest.band}`} aria-labelledby="wb-score-title">
@@ -115,6 +112,6 @@ export function WellbeingCheckApp() {
       </li>)}</ul>
     </section>
 
-    <p className="viz-caption">WHO-5 웰빙 지표(WHO, 1998; Topp 외, 2015) · 원 척도는 2주를 묻지만 하루·한 주 단위로도 쓸 수 있게 했어요. 같은 기간끼리 10점 이상 움직이면 ‘큰 변화’로 표시해요.</p>
+    <p className="viz-caption">WHO-5 웰빙 지표(WHO, 1998; Topp 외, 2015) · 원 척도는 2주를 묻지만 하루 단위로 기록하게 했어요. 같은 기간끼리 10점 이상 움직이면 ‘큰 변화’로 표시해요.</p>
   </div>;
 }
