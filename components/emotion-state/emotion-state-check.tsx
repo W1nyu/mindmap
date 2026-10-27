@@ -23,7 +23,7 @@ function CheckForm({ onDone, onCancel }: { onDone: (check: EmotionStateCheck) =>
     onDone(createEmotionStateCheck(answers as number[], new Date(), `s-${crypto.randomUUID()}`));
   }
   return <form className="viz-card wb-form" onSubmit={submit} aria-labelledby="sd-form-title">
-    <div className="viz-heading"><div><h2 id="sd-form-title">지금 이 순간 내 감정에 얼마나 해당하나요?</h2><p className="viz-caption" style={{ marginTop: 2 }}>‘이렇게 느끼는 것’은 지금 느끼는 감정을 말해요. 떠오르는 대로 골라 주세요.</p><p className="viz-caption sd-scale-key">1 전혀 아니다 · 3 어느 정도 그렇다 · 5 완전히 그렇다</p></div><span className="subtle-label">{answered} / {sders.items.length}</span></div>
+    <div className="viz-heading"><div><h2 id="sd-form-title">지금 이 순간 내 감정에 얼마나 해당하나요?</h2><p className="viz-caption" style={{ marginTop: 2 }}>‘이런 감정’은 지금 느끼는 감정을 말해요. 떠오르는 대로 골라 주세요.</p><p className="viz-caption sd-scale-key">1 전혀 아니다 · 3 어느 정도 그렇다 · 5 완전히 그렇다</p></div><span className="subtle-label">{answered} / {sders.items.length}</span></div>
     <ol className="wb-questions">
       {sders.items.map((item, index) => <li key={item.id}>
         <fieldset>
