@@ -1202,8 +1202,6 @@ section[aria-labelledby] > .section-heading { margin-bottom: 16px; }
 .module-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--module-color); flex-shrink: 0; }
 .home-module p { flex: none; }
 .module-meta { margin: 6px 0 14px; font-size: calc(14px * var(--fs)); color: var(--muted); }
-.wb-help { display: flex; gap: 8px; align-items: flex-start; margin-top: 12px; padding: 10px 12px; border-radius: var(--radius-s); background: var(--warn-bg); color: var(--warn-text); font-size: calc(14px * var(--fs)); line-height: 1.6; }
-.wb-help svg { flex-shrink: 0; margin-top: 3px; }
 .page-footer { justify-content: center; }
 .dash-hero { align-items: center; }
 

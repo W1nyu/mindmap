@@ -176,4 +176,3 @@ export const defenseCare: Partial<Record<DefenseId, readonly string[]>> = {
 };
 
 export const adviceNote = "검사 점수에 맞춰 고른 일반적인 자기돌봄 방법이에요. 치료나 진단을 대신하지 않고, 모든 방법이 모든 사람에게 맞지는 않아요. 해 보고 나에게 맞는 것을 남겨 두세요.";
-export const adviceHelp = "감정이 나나 다른 사람을 해칠 만큼 커질 때는 혼자 감당하지 마세요. 자살예방 상담전화 109 · 정신건강 위기상담 1577-0199 (24시간)";

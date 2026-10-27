@@ -81,7 +81,6 @@ export function WellbeingCheckApp() {
         <WellbeingGauge point={latest} previous={previous} />
         <h3 className="wb-band-label">{band.label}</h3>
         <p className="viz-text">{band.text}</p>
-        {latest.band === "veryLow" && <p className="wb-help"><Icon name="heart" size={15} /> 이야기 나눌 곳: 자살예방 상담전화 109 · 정신건강 위기상담 1577-0199 (24시간)</p>}
       </section>
       <section className="viz-card" aria-labelledby="wb-items-title">
         <div className="viz-heading"><div><h2 id="wb-items-title">다섯 영역</h2>{averages && <p className="viz-caption" style={{ marginTop: 2 }}>세로 표시는 평균이에요.</p>}</div></div>

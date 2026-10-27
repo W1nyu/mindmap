@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Icon } from "@/components/icon";
-import { adviceHelp, adviceNote, adviceSituations, type AdviceSituationId } from "@/data/advice";
+import { adviceNote, adviceSituations, type AdviceSituationId } from "@/data/advice";
 import { assessmentModules } from "@/data/modules";
 import { adviceFor } from "@/lib/advice";
 import type { ModuleResults } from "@/lib/integration";
@@ -29,7 +29,6 @@ export function AdviceSection({ results }: { results: ModuleResults }) {
       </ol>
       {advice.waiting.length > 0 && <p className="viz-caption advice-waiting">{advice.waiting.map((id) => assessmentModules[id].title).join(", ")} 검사를 마치면 이 상황의 맞춤 조언이 더 정확해져요.</p>}
       <p className="viz-caption">{adviceNote}</p>
-      <p className="wb-help"><Icon name="heart" size={15} /> {adviceHelp}</p>
     </div>
   </section>;
 }
